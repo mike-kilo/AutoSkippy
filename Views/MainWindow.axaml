@@ -14,7 +14,21 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
+	<Grid RowDefinitions="Auto,*,Auto" Margin="3">
+		<Label Content="Control your measurement equipment sequentially with SCPI"
+			   HorizontalAlignment="Center"
+			   FontWeight="DemiBold"/>
+		<Grid>
+			
+		</Grid>
+		<Border Grid.Row="3" 
+				BorderThickness="1" BorderBrush="{StaticResource SystemControlBackgroundBaseHighBrush}" Background="{StaticResource SystemControlBackgroundBaseLowBrush}" 
+				HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+				Margin="1">
+			<Panel>
+				<TextBlock HorizontalAlignment="Left" FontWeight="Light" Text="© 2026 MiKoSoft for Total ESD Solutions" Margin="3"/>
+				<TextBlock HorizontalAlignment="Right" FontWeight="Light" Text="{Binding VersionNumber, StringFormat=Version: {0}}" Margin="3"/>
+			</Panel>
+		</Border>
+	</Grid>
 </Window>
