@@ -68,8 +68,15 @@
 			<Grid Grid.Row="5" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,*" Margin="3" >
 				<Button Content="Run" Width="100" HorizontalContentAlignment="Center" />
 				<ProgressBar Grid.Column="2" VerticalAlignment="Stretch" ShowProgressText="True" Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
-				<Button Grid.Row="2" Content="Save" Command="{Binding SavePayloadCommand}" Width="100" HorizontalContentAlignment="Center" />
-				<Button Grid.Row="2" Grid.Column="2" Content="Save as..." Click="ButtonSaveAsClick" Width="100" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" 
+						Content="Save" 
+						Command="{Binding SavePayloadCommand}" 
+						IsEnabled="{Binding CurrentPayloadPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+						Width="100" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="2" 
+						Content="Save as..." 
+						Click="ButtonSaveAsClick" 
+						Width="100" HorizontalContentAlignment="Center" />
 			</Grid>
 			<Grid Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
