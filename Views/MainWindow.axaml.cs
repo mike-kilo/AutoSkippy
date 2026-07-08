@@ -55,5 +55,10 @@ public partial class MainWindow : Window
         });
 
         if (file is null) return;
+
+        if (vm.CurrentPayload is ScpiPayload p)
+        { 
+            MainWindowViewModel.SavePayloadToYaml(p); 
+        }
     }
 }
