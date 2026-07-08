@@ -1,3 +1,4 @@
+using AutoSkippy.Models;
 using AutoSkippy.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -6,24 +7,11 @@ using SharpYaml.Model;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text.Json;
 
 namespace AutoSkippy.Views;
 
 public partial class MainWindow : Window
 {
-    private YamlSerializerOptions _yamlSerializerOptions = new YamlSerializerOptions
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true,
-        IndentSize = 4,
-        DefaultIgnoreCondition = YamlIgnoreCondition.WhenWritingNull,
-        DuplicateKeyHandling = YamlDuplicateKeyHandling.FirstWins,
-        MappingOrder = YamlMappingOrderPolicy.Declaration,
-        UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Skip,
-        PropertyNameCaseInsensitive = true,
-    };
-
     public static FilePickerFileType SCPIPayload { get; } = new("SCPI Payload")
     {
         Patterns = [ "*.yaml" ],
@@ -58,7 +46,7 @@ public partial class MainWindow : Window
         {
             using StreamReader sr = new(vm.CurrentPayloadPath);
             var yaml = YamlStream.Load(sr);
-            var pld = YamlSerializer.Deserialize<ScpiPayload>(yaml.ToString(), _yamlSerializerOptions);
+            var pld = YamlSerializer.Deserialize<ScpiPayload>(yaml.ToString(), YamlConfig.SerializerOptions);
             if (pld is not null)
             {
                 vm.CurrentPayload = pld;

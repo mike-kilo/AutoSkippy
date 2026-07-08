@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AutoSkippy.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SharpYaml;
 using System;
@@ -24,7 +25,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public static async void SavePayloadToYaml(ScpiPayload payload, string fullFileName)
     {
-        var yaml = YamlSerializer.Serialize(payload);
+        var yaml = YamlSerializer.Serialize(payload, YamlConfig.SerializerOptions);
         try
         {
             using var sw = new StreamWriter(fullFileName, false) { AutoFlush = true };
