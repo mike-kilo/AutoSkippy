@@ -10,6 +10,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private ScpiPayload? _currentPayload;
 
+    [ObservableProperty]
+    private string _currentPayloadPath = string.Empty;
+
     public MainWindowViewModel()
     {
         CurrentPayload = new() { LoopCount = 10, SetupLines = "SETUP", LoopLines = "LOOP", TeardownLines = "TEARDOWN" };

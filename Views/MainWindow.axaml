@@ -25,10 +25,15 @@
 				<Button Content="Refresh" Margin="3" />
 				<Button Content="Connect" Margin="3" Width="100" HorizontalContentAlignment="Center" />
 			</StackPanel>
-			<StackPanel Grid.Row="1" Orientation="Horizontal" Margin="3">
+			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="3">
 				<TextBlock Text="Select SCPI payload:" VerticalAlignment="Center" Margin="3"/>
-				<ComboBox Width="150" Margin="3" />
-			</StackPanel>
+				<TextBox Grid.Column="1" 
+						 Text="{Binding CurrentPayloadPath}"
+						 IsReadOnly="True"
+						 ToolTip.Tip="{Binding CurrentPayloadPath}"
+						 HorizontalAlignment="Stretch" Margin="3" />
+				<Button Grid.Column="2" Content="Browse..." Click="ButtonBrowseClick" />
+			</Grid>
 			<Grid Grid.Row="2" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Setup" />
 				<TextBox Grid.Row="1" 
