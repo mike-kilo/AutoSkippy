@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Reflection;
 
 namespace AutoSkippy.ViewModels;
@@ -16,5 +17,11 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         CurrentPayload = new() { LoopCount = 10, SetupLines = "SETUP", LoopLines = "LOOP", TeardownLines = "TEARDOWN" };
+    }
+
+    [RelayCommand]
+    public void SavePayload()
+    {
+
     }
 }
