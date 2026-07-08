@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SharpYaml.Serialization;
+using System;
 
 namespace AutoSkippy.ViewModels;
 
@@ -23,7 +24,7 @@ public partial class ScpiPayload : ViewModelBase
 
     [YamlIgnore]
     public int StepsCount => 
-        SetupLines.Split("{Environment.NewLine}").Length + 
-        LoopCount * LoopLines.Split("{Environment.NewLine}").Length +
-        TeardownLines.Split("{Environment.NewLine}").Length;
+        SetupLines.Split(Environment.NewLine).Length + 
+        LoopCount * LoopLines.Split(Environment.NewLine).Length +
+        TeardownLines.Split(Environment.NewLine).Length;
 }
