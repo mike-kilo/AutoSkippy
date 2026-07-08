@@ -7,6 +7,7 @@
         x:Class="AutoSkippy.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/AutoSkippyIcon.ico"
+		WindowStartupLocation="CenterScreen"
         Title="AutoSkippy">
 
     <Design.DataContext>
@@ -25,13 +26,19 @@
 				<Button Content="Refresh" Margin="3" />
 				<Button Content="Connect" Margin="3" Width="100" HorizontalContentAlignment="Center" />
 			</StackPanel>
-			<StackPanel Grid.Row="1" Orientation="Horizontal" Margin="3">
+			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="3">
 				<TextBlock Text="Select SCPI payload:" VerticalAlignment="Center" Margin="3"/>
-				<ComboBox Width="150" Margin="3" />
-			</StackPanel>
+				<TextBox Grid.Column="1" 
+						 Text="{Binding CurrentPayloadPath}"
+						 IsReadOnly="True"
+						 ToolTip.Tip="{Binding CurrentPayloadPath}"
+						 HorizontalAlignment="Stretch" Margin="3" />
+				<Button Grid.Column="2" Content="Browse..." Click="ButtonBrowseClick" />
+			</Grid>
 			<Grid Grid.Row="2" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Setup" />
 				<TextBox Grid.Row="1" 
+						 Text="{Binding CurrentPayload.SetupLines, Mode=TwoWay, FallbackValue={}}"
 						 AcceptsReturn="True" TextWrapping="Wrap" 
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
@@ -40,11 +47,13 @@
 				<TextBlock Text="Loop" VerticalAlignment="Bottom" />
 				<TextBlock Grid.Column="2" Text="Repeat:" VerticalAlignment="Center" />
 				<NumericUpDown Grid.Column="3" 
+							   Value="{Binding CurrentPayload.LoopCount, Mode=TwoWay, FallbackValue=1}"
 							   Minimum="1" Maximum="20" Increment="1"
 							   VerticalAlignment="Center" Margin="3" Width="70" 
 							   HorizontalContentAlignment="Right"
 							   FormatString="N0" ParsingNumberStyle="Integer" />
 				<TextBox Grid.Row="1" Grid.ColumnSpan="4"
+						 Text="{Binding CurrentPayload.LoopLines, Mode=TwoWay, FallbackValue={}}"
 						 AcceptsReturn="True" TextWrapping="Wrap" 
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
@@ -52,13 +61,23 @@
 			<Grid Grid.Row="4" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Teardown" />
 				<TextBox Grid.Row="1" 
+						 Text="{Binding CurrentPayload.TeardownLines, Mode=TwoWay, FallbackValue={}}"
 						 AcceptsReturn="True" TextWrapping="Wrap" 
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="5" ColumnDefinitions="Auto,6,*" Margin="3" >
+			<Grid Grid.Row="5" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,*" Margin="3" >
 				<Button Content="Run" Width="100" HorizontalContentAlignment="Center" />
-				<ProgressBar Grid.Column="2" VerticalAlignment="Stretch" ShowProgressText="True" />
+				<ProgressBar Grid.Column="2" VerticalAlignment="Stretch" ShowProgressText="True" Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
+				<Button Grid.Row="2" 
+						Content="Save" 
+						Command="{Binding SavePayloadCommand}" 
+						IsEnabled="{Binding CurrentPayloadPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+						Width="100" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="2" 
+						Content="Save as..." 
+						Click="ButtonSaveAsClick" 
+						Width="100" HorizontalContentAlignment="Center" />
 			</Grid>
 			<Grid Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
