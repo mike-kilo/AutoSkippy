@@ -70,7 +70,8 @@ public partial class MainWindow : Window
             Title = "Open SCPI payload",
             DefaultExtension = "yaml",
             ShowOverwritePrompt = true,
-            SuggestedFileName = System.IO.Path.GetFileName(vm.CurrentPayloadPath),
+            SuggestedFileName = Path.GetFileName(vm.CurrentPayloadPath),
+            FileTypeChoices = [SCPIPayload, FilePickerFileTypes.All],
             SuggestedStartLocation = await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents),
             SuggestedFileType = SCPIPayload,
         });
