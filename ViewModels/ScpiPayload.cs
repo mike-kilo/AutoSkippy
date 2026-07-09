@@ -17,7 +17,7 @@ public partial class ScpiPayload : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private int _loopCount = 0;
+    private int _loopCount = 1;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]

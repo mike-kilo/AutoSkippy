@@ -92,4 +92,10 @@ public partial class MainWindow : Window
             MainWindowViewModel.SavePayloadToJson(vm.CurrentPayload, path); 
         }
     }
+
+    private void WindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (this.DataContext is not MainWindowViewModel vm) return;
+        vm.RefreshComPorts();
+    }
 }
