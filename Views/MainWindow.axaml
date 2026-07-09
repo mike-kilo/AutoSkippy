@@ -8,6 +8,7 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/AutoSkippyIcon.ico"
 		WindowStartupLocation="CenterScreen"
+		Loaded="WindowLoaded"
         Title="AutoSkippy">
 
     <Design.DataContext>

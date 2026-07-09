@@ -1,4 +1,4 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -58,4 +58,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [RelayCommand]
     public void ClearResults() => ResultsLines = string.Empty;
+
+    [RelayCommand]
+    public void RefreshComPorts()
+    {
+        AvailableComPorts.Clear();
+        foreach(var p in ComPortComm.GetPorts())
+        {
+            AvailableComPorts.Add(p);
+    }
+        }
 }
