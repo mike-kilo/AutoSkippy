@@ -1,11 +1,11 @@
-using AutoSkippy.Models;
+﻿using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SharpYaml;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 
 namespace AutoSkippy.ViewModels;
 
@@ -26,13 +26,15 @@ public partial class MainWindowViewModel : ViewModelBase
     {
     }
 
-    public static async void SavePayloadToYaml(ScpiPayload payload, string fullFileName)
+    public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName)
     {
-        var yaml = YamlSerializer.Serialize(payload, YamlConfig.SerializerOptions);
+        var json = JsonSerializer.Serialize(payload.ToSerialisable(), SourceGenerationContext.Default.ScpiPayloadSerialisable);
+
         try
         {
             using var sw = new StreamWriter(fullFileName, false) { AutoFlush = true };
-            await sw.WriteAsync(yaml);
+
+            await sw.WriteAsync(json);
             sw.Close();
             sw.Dispose();
         }
@@ -47,7 +49,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (CurrentPayload is ScpiPayload p && !string.IsNullOrEmpty(CurrentPayloadPath))
         {
-            SavePayloadToYaml(p, CurrentPayloadPath);
+            SavePayloadToJson(p, CurrentPayloadPath);
         }
     }
 
