@@ -1,7 +1,8 @@
-using AutoSkippy.Models;
+﻿using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -24,6 +25,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _recentFolder = string.Empty;
+
+    public ObservableCollection<string> AvailableComPorts { get; private set; } = [];
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ConnectComCommand))]
+    private string? _selectedComPort = string.Empty;
+
+    [ObservableProperty]
+    private int _progressSteps = 0;
 
     public MainWindowViewModel()
     {
@@ -66,6 +76,59 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach(var p in ComPortComm.GetPorts())
         {
             AvailableComPorts.Add(p);
-    }
         }
+    }
+
+    public bool IsComPortSelected() => !string.IsNullOrEmpty(SelectedComPort);
+
+    [RelayCommand(CanExecute = nameof(IsComPortSelected))]
+    public void ConnectCom()
+    {
+        if (string.IsNullOrEmpty(SelectedComPort)) return;
+        ComPortComm.OpenConnection(SelectedComPort);
+    }
+
+    [RelayCommand]
+    public void DisconnectCom()
+    {
+        ComPortComm.CloseConnection();
+    }
+
+    [RelayCommand]
+    public void RunMeasurement()
+    {
+        ProgressSteps = 0;
+        if (CurrentPayload.StepsCount == 0) return;
+        if (!ComPortComm.IsConnected) return;
+
+        foreach (var line in CurrentPayload.SetupLines.Split(Environment.NewLine))
+        {
+            ProcessScpiLine(line);
+        }
+
+        for (int l = 0; l < CurrentPayload.LoopCount; l++)
+        {
+            foreach (var line in CurrentPayload.LoopLines.Split(Environment.NewLine))
+            {
+                ProcessScpiLine(line);
+            }
+        }
+
+        foreach (var line in CurrentPayload.TeardownLines.Split(Environment.NewLine))
+        {
+            ProcessScpiLine(line);
+        }
+    }
+
+    private void ProcessScpiLine(string line)
+    {
+        ComPortComm.SendString(line);
+        var received = ComPortComm.Read();
+        if (!string.IsNullOrEmpty(received))
+        {
+            ResultsLines += received + Environment.NewLine;
+        }
+
+        ProgressSteps++;
+    }
 }
