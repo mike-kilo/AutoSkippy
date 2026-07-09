@@ -1,4 +1,4 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SharpYaml;
@@ -18,6 +18,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _currentPayloadPath = string.Empty;
+
+    [ObservableProperty]
+    private string _resultsLines = string.Empty;
 
     public MainWindowViewModel()
     {
@@ -47,4 +50,7 @@ public partial class MainWindowViewModel : ViewModelBase
             SavePayloadToYaml(p, CurrentPayloadPath);
         }
     }
+
+    [RelayCommand]
+    public void ClearResults() => ResultsLines = string.Empty;
 }

@@ -82,13 +82,15 @@
 			<Grid Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
 				<TextBox Grid.Row="1"
+						 Text="{Binding ResultsLines}"
+						 IsReadOnly="True"
 						 AcceptsReturn="True" TextWrapping="Wrap"
 						 VerticalAlignment="Stretch"
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
 			<Grid Grid.Row="5" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" >
 				<Button Grid.Column="1" Content="Copy" Width="100" HorizontalContentAlignment="Center" />
-				<Button Grid.Column="3" Content="Clear" Width="100" HorizontalContentAlignment="Center" />
+				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
 			</Grid>
 		</Grid>
 		<Border Grid.Row="3" 
