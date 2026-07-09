@@ -22,6 +22,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _resultsLines = string.Empty;
 
+    [ObservableProperty]
+    private string _recentFolder = string.Empty;
+
     public MainWindowViewModel()
     {
     }

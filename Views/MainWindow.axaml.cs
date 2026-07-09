@@ -27,17 +27,21 @@ public partial class MainWindow : Window
         if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
         if (this.DataContext is not MainWindowViewModel vm) return;
 
+        var suggestedFolder = !string.IsNullOrEmpty(vm.RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(vm.RecentFolder) is IStorageFolder sf ?
+                sf : await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
         // Start async operation to open the dialog.
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Open SCPI payload",
             AllowMultiple = false,
-            SuggestedStartLocation = await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents),
+            SuggestedStartLocation = suggestedFolder,
             FileTypeFilter = [ SCPIPayload, FilePickerFileTypes.All ],
             SuggestedFileType = SCPIPayload,
         });
 
         if (files.Count != 1) return;
+        vm.RecentFolder = Path.GetDirectoryName(files[0].Path.LocalPath) ?? string.Empty;
 
         vm.CurrentPayload = new();
         vm.CurrentPayloadPath = files[0].Path.LocalPath;
@@ -64,6 +68,9 @@ public partial class MainWindow : Window
         if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
         if (this.DataContext is not MainWindowViewModel vm) return;
 
+        var suggestedFolder = !string.IsNullOrEmpty(vm.RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(vm.RecentFolder) is IStorageFolder sf ?
+        sf : await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
         // Start async operation to open the dialog.
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
@@ -72,11 +79,13 @@ public partial class MainWindow : Window
             ShowOverwritePrompt = true,
             SuggestedFileName = Path.GetFileName(vm.CurrentPayloadPath),
             FileTypeChoices = [SCPIPayload, FilePickerFileTypes.All],
-            SuggestedStartLocation = await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents),
+            SuggestedStartLocation = suggestedFolder,
             SuggestedFileType = SCPIPayload,
         });
 
         if (file is null) return;
+
+        vm.RecentFolder = Path.GetDirectoryName(file.Path.LocalPath) ?? string.Empty;
 
         if (file.TryGetLocalPath() is string path)
         { 
