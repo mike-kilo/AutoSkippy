@@ -2,11 +2,10 @@ using AutoSkippy.Models;
 using AutoSkippy.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using SharpYaml;
-using SharpYaml.Model;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 
 namespace AutoSkippy.Views;
 
@@ -14,8 +13,8 @@ public partial class MainWindow : Window
 {
     public static FilePickerFileType SCPIPayload { get; } = new("SCPI Payload")
     {
-        Patterns = [ "*.yaml" ],
-        MimeTypes = ["text/x-yaml"],
+        Patterns = [ "*.json" ],
+        MimeTypes = ["text/json"],
     };
 
     public MainWindow()
@@ -45,11 +44,13 @@ public partial class MainWindow : Window
         try
         {
             using StreamReader sr = new(vm.CurrentPayloadPath);
-            var yaml = YamlStream.Load(sr);
-            var pld = YamlSerializer.Deserialize<ScpiPayload>(yaml.ToString(), YamlConfig.SerializerOptions);
+            var json = sr.ReadToEnd();
+
+            var pld = JsonSerializer.Deserialize<ScpiPayloadSerialisable>(json, JsonConfig.DeserialiserOptions);
+
             if (pld is not null)
             {
-                vm.CurrentPayload = pld;
+                vm.CurrentPayload = pld.ToActual();
             }
         }
         catch (Exception ex)
@@ -78,7 +79,7 @@ public partial class MainWindow : Window
 
         if (file.TryGetLocalPath() is string path)
         { 
-            MainWindowViewModel.SavePayloadToYaml(vm.CurrentPayload, path); 
+            MainWindowViewModel.SavePayloadToJson(vm.CurrentPayload, path); 
         }
     }
 }
