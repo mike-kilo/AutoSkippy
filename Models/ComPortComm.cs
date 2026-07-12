@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading;
@@ -114,20 +115,23 @@ public partial class ComPortComm :ObservableObject
     public async Task<string> ReadAsync()
     {
         if (_serialPort is null) return string.Empty;
-        var buffer = new Memory<byte>();
+        var buffer = new char[4096];
         int count = 0;
         try
         {
-            count = await _serialPort.BaseStream.ReadAsync(buffer, _cancellationTokenSource.Token);
+            _cancellationTokenSource.TryReset();
+            count = await Task.Run(() => count = _serialPort.Read(buffer, 0, 4096))
+                .ContinueWith(t => t.Result);
         }
-        catch
-        { 
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.ToString());
             return string.Empty; 
         }
 
         if (count == 0) return string.Empty;
-        
-        return new string([ .. buffer[..count].ToArray().Select(b => (char)b)]);
+
+        return new string([.. buffer.Take(count)]);
     }
 
     public bool Send(string data)
@@ -143,6 +147,11 @@ public partial class ComPortComm :ObservableObject
             _serialPort.WriteLine(data);
             Debug.WriteLine($"Sent: {data}");
             return true;
+        }
+        catch (IOException)
+        {
+            Debug.WriteLine("IOException when sending data.");
+            return false;
         }
         catch (TimeoutException)
         {
