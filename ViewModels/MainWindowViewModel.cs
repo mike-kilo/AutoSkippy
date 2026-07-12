@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AutoSkippy.ViewModels;
@@ -28,7 +27,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _recentFolder = string.Empty;
 
+    [ObservableProperty]
+    private ComPortComm _communicator = new();
+
     public ObservableCollection<string> AvailableComPorts { get; private set; } = [];
+
+    public PayloadProcessor Processor { get; private set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectComCommand))]
@@ -39,6 +43,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        Processor = new(Communicator);
+        Processor.PropertyChanged += ProcessorPropertyChanged;
+    }
+
+    private void ProcessorPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (nameof(PayloadProcessor.ProgressStep).Equals(e.PropertyName)) 
+            ProgressSteps = Processor.ProgressStep;
     }
 
     public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName)
@@ -87,60 +99,21 @@ public partial class MainWindowViewModel : ViewModelBase
     public void ConnectCom()
     {
         if (string.IsNullOrEmpty(SelectedComPort)) return;
-        ComPortComm.OpenConnection(SelectedComPort);
+        Communicator.OpenConnection(SelectedComPort);
     }
 
     [RelayCommand]
-    public void DisconnectCom()
-    {
-        ComPortComm.CloseConnection();
-    }
+    public void DisconnectCom() => Communicator.CloseConnection();
 
     [RelayCommand]
-    public async Task RunMeasurement()
+    public async Task RunPayload()
     {
         ProgressSteps = 0;
         if (CurrentPayload.StepsCount == 0) return;
-        if (!ComPortComm.IsConnected) return;
 
-        foreach (var line in CurrentPayload.SetupLines.Split(Environment.NewLine))
-        {
-            await ProcessScpiLine(line);
-        }
-
-        for (int l = 0; l < CurrentPayload.LoopCount; l++)
-        {
-            foreach (var line in CurrentPayload.LoopLines.Split(Environment.NewLine))
-            {
-                await ProcessScpiLine(line);
-            }
-        }
-
-        foreach (var line in CurrentPayload.TeardownLines.Split(Environment.NewLine))
-        {
-            await ProcessScpiLine(line);
-        }
+        await Processor.Process(CurrentPayload);
     }
 
-    private async Task ProcessScpiLine(string line)
-    {
-        ComPortComm.Send(line);
-        var received = string.Empty;
-        if (line.EndsWith("?"))
-        {
-                Thread.Sleep(ComPortComm.TIMEOUT / 2);
-                received = await ComPortComm.ReadAsync();
-        }
-        else
-        {
-            Thread.Sleep(ComPortComm.TIMEOUT);
-        }
-        
-        if (!string.IsNullOrEmpty(received))
-        {
-            ResultsLines += received.Trim() + Environment.NewLine;
-        }
-
-        ProgressSteps++;
-    }
+    [RelayCommand]
+    public async Task AbortPayload() => Processor.IsBreakRequested = true;
 }

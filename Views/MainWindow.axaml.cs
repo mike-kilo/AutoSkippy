@@ -1,6 +1,7 @@
 using AutoSkippy.Models;
 using AutoSkippy.ViewModels;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using System;
 using System.Diagnostics;
@@ -97,5 +98,14 @@ public partial class MainWindow : Window
     {
         if (this.DataContext is not MainWindowViewModel vm) return;
         vm.RefreshComPorts();
+    }
+
+    private async void ButtonCopyClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
+        if (this.DataContext is not MainWindowViewModel vm) return;
+        if (topLevel.Clipboard is not IClipboard clipboard) return;
+
+        await clipboard.SetTextAsync(vm.ResultsLines);
     }
 }

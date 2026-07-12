@@ -3,11 +3,13 @@
         xmlns:vm="using:AutoSkippy.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="AutoSkippy.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+		xmlns:fi="using:FluentIcons.Avalonia"
         Icon="/Assets/AutoSkippyIcon.ico"
 		WindowStartupLocation="CenterScreen"
+		MinWidth="800" MinHeight="600"
 		Loaded="WindowLoaded"
         Title="AutoSkippy">
 
@@ -20,17 +22,28 @@
 		<Label Content="Control your measurement equipment sequentially with SCPI"
 			   HorizontalAlignment="Center"
 			   FontWeight="DemiBold"/>
-		<Grid Grid.Row="1" RowDefinitions="Auto,Auto,*,2*,*,Auto,Auto" ColumnDefinitions="*,*" Margin="3">
+		<Grid Grid.Row="1" RowDefinitions="Auto,Auto,2*,2*,*,Auto,Auto" ColumnDefinitions="*,*" Margin="3">
 			<StackPanel Orientation="Horizontal" Margin="3" >
 				<TextBlock Text="Select COM port:" VerticalAlignment="Center" Margin="3"/>
-				<ComboBox Width="150" Margin="3"
+				<ComboBox Width="100" Margin="3"
 						  ItemsSource="{Binding AvailableComPorts}"
 						  SelectedItem="{Binding SelectedComPort, Mode=TwoWay} "/>
-				<Button Content="Refresh" Command="{Binding RefreshComPortsCommand}" Margin="3" />
-				<Button Content="Connect" Command="{Binding ConnectComCommand}" Margin="3" Width="100" HorizontalContentAlignment="Center" />
-				<Button Content="Disconnect" Command="{Binding DisconnectComCommand}" Margin="3" Width="100" HorizontalContentAlignment="Center" />
+				<Button Command="{Binding RefreshComPortsCommand}" Margin="3" 
+						ToolTip.Tip="Refresh">
+					<Button.Content>
+						<fi:SymbolIcon Symbol="ArrowClockwise" IconVariant="Regular" />
+					</Button.Content>
+				</Button>
+				<Button Content="Connect" Command="{Binding ConnectComCommand}" 
+						IsVisible="{Binding Communicator.IsConnected, Converter={x:Static BoolConverters.Not}, FallbackValue=True}"
+						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
+				<Button Content="Disconnect" Command="{Binding DisconnectComCommand}" 
+						IsVisible="{Binding Communicator.IsConnected, FallbackValue=False}"
+						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
 			</StackPanel>
-			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="3">
+			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" 
+				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+				  Margin="3">
 				<TextBlock Text="Select SCPI payload:" VerticalAlignment="Center" Margin="3"/>
 				<TextBox Grid.Column="1" 
 						 Text="{Binding CurrentPayloadPath}"
@@ -39,7 +52,9 @@
 						 HorizontalAlignment="Stretch" Margin="3" />
 				<Button Grid.Column="2" Content="Browse..." Click="ButtonBrowseClick" />
 			</Grid>
-			<Grid Grid.Row="2" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
+			<Grid Grid.Row="2" RowDefinitions="Auto,*" 
+				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Setup" />
 				<TextBox Grid.Row="1" 
 						 Text="{Binding CurrentPayload.SetupLines, Mode=TwoWay, FallbackValue={}}"
@@ -47,7 +62,9 @@
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="3" RowDefinitions="Auto,*" ColumnDefinitions="Auto,*,Auto,Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
+			<Grid Grid.Row="3" RowDefinitions="Auto,*" ColumnDefinitions="Auto,*,Auto,Auto" 
+				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Loop" VerticalAlignment="Bottom" />
 				<TextBlock Grid.Column="2" Text="Repeat:" VerticalAlignment="Center" />
 				<NumericUpDown Grid.Column="3" 
@@ -62,7 +79,9 @@
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="4" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
+			<Grid Grid.Row="4" RowDefinitions="Auto,*"
+				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Teardown" />
 				<TextBox Grid.Row="1" 
 						 Text="{Binding CurrentPayload.TeardownLines, Mode=TwoWay, FallbackValue={}}"
@@ -70,22 +89,32 @@
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="5" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,*" Margin="3" >
-				<Button Content="Run" Command="{Binding RunMeasurementCommand}" Width="100" HorizontalContentAlignment="Center" />
-				<ProgressBar Grid.Column="2" VerticalAlignment="Stretch" 
+			<Grid Grid.Row="5" ColumnDefinitions="Auto,3,Auto,6,*" 
+				  IsEnabled="{Binding Communicator.IsConnected}"
+				  Margin="3" >
+				<Button Content="Run" Command="{Binding RunPayloadCommand}" 
+						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+				<Button Content="Abort" Command="{Binding AbortPayloadCommand}" 
+                        Grid.Column="2"
+						IsEnabled="{Binding Processor.IsProcessing}"
+						Width="59" HorizontalContentAlignment="Center" />
+				<ProgressBar Grid.Column="4" VerticalAlignment="Stretch" 
 							 ShowProgressText="True" 
 							 Value="{Binding ProgressSteps}"
 							 Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
-				<Button Grid.Row="2" 
-						Content="Save" 
-						Command="{Binding SavePayloadCommand}" 
-						IsEnabled="{Binding CurrentPayloadPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-						Width="100" HorizontalContentAlignment="Center" />
-				<Button Grid.Row="2" Grid.Column="2" 
-						Content="Save as..." 
-						Click="ButtonSaveAsClick" 
-						Width="100" HorizontalContentAlignment="Center" />
 			</Grid>
+			<StackPanel Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" Grid.Row="6">
+				<Button Grid.Row="2"
+						Content="Save"
+						Command="{Binding SavePayloadCommand}"
+						IsEnabled="{Binding CurrentPayloadPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+						Width="120" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="2"
+						Content="Save as..."
+						Click="ButtonSaveAsClick"
+						Width="120" HorizontalContentAlignment="Center" />
+			</StackPanel>
 			<Grid Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
 				<TextBox Grid.Row="1"
@@ -95,8 +124,10 @@
 						 VerticalAlignment="Stretch"
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="5" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" >
-				<Button Grid.Column="1" Content="Copy" Width="100" HorizontalContentAlignment="Center" />
+			<Grid Grid.Row="5" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
+				<Button Grid.Column="1" Content="Copy" 
+						Click="ButtonCopyClick"
+						Width="100" HorizontalContentAlignment="Center" />
 				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
 			</Grid>
 		</Grid>
