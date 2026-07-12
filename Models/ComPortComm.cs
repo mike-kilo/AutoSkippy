@@ -2,12 +2,17 @@
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AutoSkippy.Models;
 
 public static class ComPortComm
 {
+    public static readonly int TIMEOUT = 1000;
+
+    private static CancellationTokenSource _cancellationTokenSource = new(TIMEOUT);
+
     public static string[] GetPorts() => SerialPort.GetPortNames();
 
     private static SerialPort? _serialPort;
@@ -26,8 +31,8 @@ public static class ComPortComm
                 StopBits = StopBits.One,
                 Handshake = Handshake.None,
                 RtsEnable = rts,
-                ReadTimeout = 1000,
-                WriteTimeout = 1000
+                ReadTimeout = TIMEOUT,
+                WriteTimeout = TIMEOUT,
             };
 
             if (!_serialPort.IsOpen)
@@ -62,25 +67,6 @@ public static class ComPortComm
         }
 
         return false;
-    }
-
-    public static async Task<string> ReadAsync()
-    {
-        if (_serialPort is null) return string.Empty;
-        var buffer = new Memory<byte>();
-        int count = 0;
-        try
-        {
-            count = await _serialPort.BaseStream.ReadAsync(buffer);
-        }
-        catch
-        { 
-            return string.Empty; 
-        }
-
-        if (count == 0) return string.Empty;
-        
-        return new string([ .. buffer[..count].ToArray().Select(b => (char)b)]);
     }
 
     public static void CloseConnection()
@@ -119,7 +105,26 @@ public static class ComPortComm
         }
     }
 
-    public static bool SendString(string data)
+    public static async Task<string> ReadAsync()
+    {
+        if (_serialPort is null) return string.Empty;
+        var buffer = new Memory<byte>();
+        int count = 0;
+        try
+        {
+            count = await _serialPort.BaseStream.ReadAsync(buffer, _cancellationTokenSource.Token);
+        }
+        catch
+        { 
+            return string.Empty; 
+        }
+
+        if (count == 0) return string.Empty;
+        
+        return new string([ .. buffer[..count].ToArray().Select(b => (char)b)]);
+    }
+
+    public static bool Send(string data)
     {
         if (!IsConnected || _serialPort is null)
         {
