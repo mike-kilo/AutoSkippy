@@ -8,11 +8,18 @@ namespace AutoSkippy.Models;
 
 public partial class PayloadProcessor(ComPortComm communicator) : ObservableObject
 {
-    [ObservableProperty]
-    private bool _isProcessing = false;
+    public class LineReceivedEventArgs : EventArgs
+    {
+        public required string Text { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+
+    public event EventHandler<LineReceivedEventArgs>? LineReceived;
+
+    public event EventHandler? Progressed;
 
     [ObservableProperty]
-    private int _progressStep = 0;
+    private bool _isProcessing = false;
 
     [ObservableProperty]
     private bool _isBreakRequested = false;
@@ -22,7 +29,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
     private async Task<string?> ProcessScpiLine(string line)
     {
         if (!Communicator.IsConnected) return null;
-        Communicator.Send(line);
+        await Task.Run(() => Communicator.Send(line));
         var received = string.Empty;
         if (line.EndsWith('?'))
         {
@@ -34,7 +41,12 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
             Thread.Sleep(ComPortComm.TIMEOUT);
         }
 
-        ProgressStep++;
+        Progressed?.Invoke(this, new EventArgs());
+        if (!string.IsNullOrEmpty(received))
+        { 
+            LineReceived?.Invoke(this, new LineReceivedEventArgs() { Text = received, Timestamp = DateTime.Now }); 
+        }
+        
         return string.IsNullOrEmpty(received) ? null : received.Trim();
     }
 

@@ -44,14 +44,13 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         Processor = new(Communicator);
-        Processor.PropertyChanged += ProcessorPropertyChanged;
+        Processor.Progressed += ProcessorProgressed;
+        Processor.LineReceived += ProcessorLineReceived;
     }
 
-    private void ProcessorPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (nameof(PayloadProcessor.ProgressStep).Equals(e.PropertyName)) 
-            ProgressSteps = Processor.ProgressStep;
-    }
+    private void ProcessorProgressed(object? sender, EventArgs e) => ProgressSteps++;
+
+    private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => ResultsLines += e.Text.Trim() + Environment.NewLine;
 
     public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName)
     {
