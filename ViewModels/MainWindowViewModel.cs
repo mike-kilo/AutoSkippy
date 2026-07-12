@@ -30,6 +30,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<string> AvailableComPorts { get; private set; } = [];
 
+    public PayloadProcessor Processor { get; private set; } = new();
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectComCommand))]
     private string? _selectedComPort = string.Empty;
@@ -39,6 +41,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        Processor.PropertyChanged += ProcessorPropertyChanged;
+    }
+
+    private void ProcessorPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (nameof(PayloadProcessor.ProgressStep).Equals(e.PropertyName)) 
+            ProgressSteps = Processor.ProgressStep;
     }
 
     public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName)
@@ -97,50 +106,11 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task RunMeasurement()
+    public async Task RunPayload()
     {
         ProgressSteps = 0;
         if (CurrentPayload.StepsCount == 0) return;
-        if (!ComPortComm.IsConnected) return;
 
-        foreach (var line in CurrentPayload.SetupLines.Split(Environment.NewLine))
-        {
-            await ProcessScpiLine(line);
-        }
-
-        for (int l = 0; l < CurrentPayload.LoopCount; l++)
-        {
-            foreach (var line in CurrentPayload.LoopLines.Split(Environment.NewLine))
-            {
-                await ProcessScpiLine(line);
-            }
-        }
-
-        foreach (var line in CurrentPayload.TeardownLines.Split(Environment.NewLine))
-        {
-            await ProcessScpiLine(line);
-        }
-    }
-
-    private async Task ProcessScpiLine(string line)
-    {
-        ComPortComm.Send(line);
-        var received = string.Empty;
-        if (line.EndsWith("?"))
-        {
-                Thread.Sleep(ComPortComm.TIMEOUT / 2);
-                received = await ComPortComm.ReadAsync();
-        }
-        else
-        {
-            Thread.Sleep(ComPortComm.TIMEOUT);
-        }
-        
-        if (!string.IsNullOrEmpty(received))
-        {
-            ResultsLines += received.Trim() + Environment.NewLine;
-        }
-
-        ProgressSteps++;
+        await Processor.Process(CurrentPayload);
     }
 }

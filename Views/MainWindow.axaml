@@ -71,7 +71,7 @@
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
 			<Grid Grid.Row="5" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,*" Margin="3" >
-				<Button Content="Run" Command="{Binding RunMeasurementCommand}" Width="100" HorizontalContentAlignment="Center" />
+				<Button Content="Run" Command="{Binding RunPayloadCommand}" Width="100" HorizontalContentAlignment="Center" />
 				<ProgressBar Grid.Column="2" VerticalAlignment="Stretch" 
 							 ShowProgressText="True" 
 							 Value="{Binding ProgressSteps}"

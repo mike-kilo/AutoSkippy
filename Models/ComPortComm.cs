@@ -149,4 +149,6 @@ public static class ComPortComm
             return false;
         }
     }
+
+    public static void Cancel() => _cancellationTokenSource.Cancel();
 }
