@@ -125,7 +125,9 @@
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
 			<Grid Grid.Row="5" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
-				<Button Grid.Column="1" Content="Copy" Width="100" HorizontalContentAlignment="Center" />
+				<Button Grid.Column="1" Content="Copy" 
+						Click="ButtonCopyClick"
+						Width="100" HorizontalContentAlignment="Center" />
 				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
 			</Grid>
 		</Grid>
