@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
@@ -7,20 +8,23 @@ using System.Threading.Tasks;
 
 namespace AutoSkippy.Models;
 
-public static class ComPortComm
+public partial class ComPortComm :ObservableObject
 {
     public static readonly int TIMEOUT = 1000;
 
-    private static CancellationTokenSource _cancellationTokenSource = new(TIMEOUT);
+    private CancellationTokenSource _cancellationTokenSource = new(TIMEOUT);
 
     public static string[] GetPorts() => SerialPort.GetPortNames();
 
-    private static SerialPort? _serialPort;
+    private SerialPort? _serialPort;
 
-    public static bool IsConnected => _serialPort is not null;
+    [ObservableProperty]
+    private bool _isConnected = false;
 
-    public static bool OpenConnection(string portName, int baudRate = 9600, bool rts = false)
+    public bool OpenConnection(string portName, int baudRate = 9600, bool rts = false)
     {
+        IsConnected = false;
+
         try
         {
             _serialPort = new SerialPort(portName)
@@ -47,6 +51,7 @@ public static class ComPortComm
                     return false;
                 }
 
+                IsConnected = true;
                 return true;
             }
         }
@@ -69,8 +74,9 @@ public static class ComPortComm
         return false;
     }
 
-    public static void CloseConnection()
+    public void CloseConnection()
     {
+        IsConnected = false;
         if (_serialPort?.IsOpen == true)
         {
             _serialPort.Close();
@@ -79,7 +85,7 @@ public static class ComPortComm
         }
     }
 
-    public static string Read()
+    public string Read()
     {
         if (!IsConnected || _serialPort is null)
         {
@@ -105,7 +111,7 @@ public static class ComPortComm
         }
     }
 
-    public static async Task<string> ReadAsync()
+    public async Task<string> ReadAsync()
     {
         if (_serialPort is null) return string.Empty;
         var buffer = new Memory<byte>();
@@ -124,7 +130,7 @@ public static class ComPortComm
         return new string([ .. buffer[..count].ToArray().Select(b => (char)b)]);
     }
 
-    public static bool Send(string data)
+    public bool Send(string data)
     {
         if (!IsConnected || _serialPort is null)
         {
@@ -150,5 +156,5 @@ public static class ComPortComm
         }
     }
 
-    public static void Cancel() => _cancellationTokenSource.Cancel();
+    public void Cancel() => _cancellationTokenSource.Cancel();
 }

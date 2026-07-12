@@ -34,8 +34,12 @@
 						<fi:SymbolIcon Symbol="ArrowClockwise" IconVariant="Regular" />
 					</Button.Content>
 				</Button>
-				<Button Content="Connect" Command="{Binding ConnectComCommand}" Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
-				<Button Content="Disconnect" Command="{Binding DisconnectComCommand}" Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
+				<Button Content="Connect" Command="{Binding ConnectComCommand}" 
+						IsVisible="{Binding Communicator.IsConnected, Converter={x:Static BoolConverters.Not}, FallbackValue=True}"
+						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
+				<Button Content="Disconnect" Command="{Binding DisconnectComCommand}" 
+						IsVisible="{Binding Communicator.IsConnected, FallbackValue=False}"
+						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
 			</StackPanel>
 			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" 
 				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"

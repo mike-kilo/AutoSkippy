@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AutoSkippy.ViewModels;
@@ -28,9 +27,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _recentFolder = string.Empty;
 
+    [ObservableProperty]
+    private ComPortComm _communicator = new();
+
     public ObservableCollection<string> AvailableComPorts { get; private set; } = [];
 
-    public PayloadProcessor Processor { get; private set; } = new();
+    public PayloadProcessor Processor { get; private set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectComCommand))]
@@ -41,6 +43,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        Processor = new(Communicator);
         Processor.PropertyChanged += ProcessorPropertyChanged;
     }
 
@@ -96,14 +99,11 @@ public partial class MainWindowViewModel : ViewModelBase
     public void ConnectCom()
     {
         if (string.IsNullOrEmpty(SelectedComPort)) return;
-        ComPortComm.OpenConnection(SelectedComPort);
+        Communicator.OpenConnection(SelectedComPort);
     }
 
     [RelayCommand]
-    public void DisconnectCom()
-    {
-        ComPortComm.CloseConnection();
-    }
+    public void DisconnectCom() => Communicator.CloseConnection();
 
     [RelayCommand]
     public async Task RunPayload()

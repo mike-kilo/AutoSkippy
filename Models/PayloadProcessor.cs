@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AutoSkippy.Models;
 
-public partial class PayloadProcessor : ObservableObject
+public partial class PayloadProcessor(ComPortComm communicator) : ObservableObject
 {
     [ObservableProperty]
     private bool _isProcessing = false;
@@ -17,14 +17,17 @@ public partial class PayloadProcessor : ObservableObject
     [ObservableProperty]
     private bool _isBreakRequested = false;
 
+    public ComPortComm Communicator { get; private set; } = communicator;
+
     private async Task<string?> ProcessScpiLine(string line)
     {
-        ComPortComm.Send(line);
+        if (!Communicator.IsConnected) return null;
+        Communicator.Send(line);
         var received = string.Empty;
         if (line.EndsWith('?'))
         {
             Thread.Sleep(ComPortComm.TIMEOUT / 2);
-            received = await ComPortComm.ReadAsync();
+            received = await Communicator.ReadAsync();
         }
         else
         {
@@ -37,7 +40,7 @@ public partial class PayloadProcessor : ObservableObject
 
     public async Task Process(ScpiPayload payload)
     {
-        if (!ComPortComm.IsConnected) return;
+        if (!Communicator.IsConnected) return;
         if (payload is null) return;
 
         IsProcessing = true;
@@ -70,6 +73,6 @@ public partial class PayloadProcessor : ObservableObject
 
     partial void OnIsBreakRequestedChanged(bool value)
     {
-        if (value) ComPortComm.Cancel();
+        if (value && Communicator.IsConnected) Communicator.Cancel();
     }
 }
