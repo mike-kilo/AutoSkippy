@@ -89,29 +89,32 @@
 						 VerticalAlignment="Stretch" 
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="5" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,*" Margin="3" >
-				<StackPanel Orientation="Horizontal" Spacing="2" HorizontalAlignment="Stretch">
-					<Button Content="Run" Command="{Binding RunPayloadCommand}" 
-							IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
-							Width="59" HorizontalContentAlignment="Center" />
-					<Button Content="Abort" Command="{Binding AbortPayloadCommand}" 
-							IsEnabled="{Binding Processor.IsProcessing}"
-							Width="59" HorizontalContentAlignment="Center" />
-				</StackPanel>
-				<ProgressBar Grid.Column="2" VerticalAlignment="Stretch" 
+			<Grid Grid.Row="5" ColumnDefinitions="Auto,3,Auto,6,*" 
+				  IsEnabled="{Binding Communicator.IsConnected}"
+				  Margin="3" >
+				<Button Content="Run" Command="{Binding RunPayloadCommand}" 
+						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+				<Button Content="Abort" Command="{Binding AbortPayloadCommand}" 
+                        Grid.Column="2"
+						IsEnabled="{Binding Processor.IsProcessing}"
+						Width="59" HorizontalContentAlignment="Center" />
+				<ProgressBar Grid.Column="4" VerticalAlignment="Stretch" 
 							 ShowProgressText="True" 
 							 Value="{Binding ProgressSteps}"
 							 Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
-				<Button Grid.Row="2" 
-						Content="Save" 
-						Command="{Binding SavePayloadCommand}" 
+			</Grid>
+			<StackPanel Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" Grid.Row="6">
+				<Button Grid.Row="2"
+						Content="Save"
+						Command="{Binding SavePayloadCommand}"
 						IsEnabled="{Binding CurrentPayloadPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
 						Width="120" HorizontalContentAlignment="Center" />
-				<Button Grid.Row="2" Grid.Column="2" 
-						Content="Save as..." 
-						Click="ButtonSaveAsClick" 
+				<Button Grid.Row="2" Grid.Column="2"
+						Content="Save as..."
+						Click="ButtonSaveAsClick"
 						Width="120" HorizontalContentAlignment="Center" />
-			</Grid>
+			</StackPanel>
 			<Grid Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
 				<TextBox Grid.Row="1"
