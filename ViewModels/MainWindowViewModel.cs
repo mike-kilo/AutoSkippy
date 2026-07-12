@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoSkippy.ViewModels;
 
@@ -95,7 +97,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public void RunMeasurement()
+    public async Task RunMeasurement()
     {
         ProgressSteps = 0;
         if (CurrentPayload.StepsCount == 0) return;
@@ -103,30 +105,40 @@ public partial class MainWindowViewModel : ViewModelBase
 
         foreach (var line in CurrentPayload.SetupLines.Split(Environment.NewLine))
         {
-            ProcessScpiLine(line);
+            await ProcessScpiLine(line);
         }
 
         for (int l = 0; l < CurrentPayload.LoopCount; l++)
         {
             foreach (var line in CurrentPayload.LoopLines.Split(Environment.NewLine))
             {
-                ProcessScpiLine(line);
+                await ProcessScpiLine(line);
             }
         }
 
         foreach (var line in CurrentPayload.TeardownLines.Split(Environment.NewLine))
         {
-            ProcessScpiLine(line);
+            await ProcessScpiLine(line);
         }
     }
 
-    private void ProcessScpiLine(string line)
+    private async Task ProcessScpiLine(string line)
     {
-        ComPortComm.SendString(line);
-        var received = ComPortComm.Read();
+        ComPortComm.Send(line);
+        var received = string.Empty;
+        if (line.EndsWith("?"))
+        {
+                Thread.Sleep(ComPortComm.TIMEOUT / 2);
+                received = await ComPortComm.ReadAsync();
+        }
+        else
+        {
+            Thread.Sleep(ComPortComm.TIMEOUT);
+        }
+        
         if (!string.IsNullOrEmpty(received))
         {
-            ResultsLines += received + Environment.NewLine;
+            ResultsLines += received.Trim() + Environment.NewLine;
         }
 
         ProgressSteps++;
