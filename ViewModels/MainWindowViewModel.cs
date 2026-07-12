@@ -45,7 +45,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Processor = new(Communicator);
         Processor.PropertyChanged += ProcessorPropertyChanged;
+        Processor.LineReceived += ProcessorLineReceived;
     }
+
+    private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => ResultsLines += e.Text.Trim() + Environment.NewLine;
 
     private void ProcessorPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {

@@ -1,4 +1,4 @@
-using AutoSkippy.ViewModels;
+﻿using AutoSkippy.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Threading;
@@ -8,6 +8,14 @@ namespace AutoSkippy.Models;
 
 public partial class PayloadProcessor(ComPortComm communicator) : ObservableObject
 {
+    public class LineReceivedEventArgs : EventArgs
+    {
+        public required string Text { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+
+    public event EventHandler<LineReceivedEventArgs>? LineReceived;
+
     [ObservableProperty]
     private bool _isProcessing = false;
 
@@ -35,6 +43,11 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
         }
 
         ProgressStep++;
+        if (!string.IsNullOrEmpty(received))
+        { 
+            LineReceived?.Invoke(this, new LineReceivedEventArgs() { Text = received, Timestamp = DateTime.Now }); 
+        }
+        
         return string.IsNullOrEmpty(received) ? null : received.Trim();
     }
 
