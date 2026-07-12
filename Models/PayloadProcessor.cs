@@ -16,11 +16,10 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
 
     public event EventHandler<LineReceivedEventArgs>? LineReceived;
 
-    [ObservableProperty]
-    private bool _isProcessing = false;
+    public event EventHandler? Progressed;
 
     [ObservableProperty]
-    private int _progressStep = 0;
+    private bool _isProcessing = false;
 
     [ObservableProperty]
     private bool _isBreakRequested = false;
@@ -42,7 +41,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
             Thread.Sleep(ComPortComm.TIMEOUT);
         }
 
-        ProgressStep++;
+        Progressed?.Invoke(this, new EventArgs());
         if (!string.IsNullOrEmpty(received))
         { 
             LineReceived?.Invoke(this, new LineReceivedEventArgs() { Text = received, Timestamp = DateTime.Now }); 
