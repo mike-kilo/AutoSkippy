@@ -1,4 +1,4 @@
-﻿using AutoSkippy.ViewModels;
+using AutoSkippy.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Threading;
@@ -22,7 +22,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
     private async Task<string?> ProcessScpiLine(string line)
     {
         if (!Communicator.IsConnected) return null;
-        Communicator.Send(line);
+        await Task.Run(() => Communicator.Send(line));
         var received = string.Empty;
         if (line.EndsWith('?'))
         {
