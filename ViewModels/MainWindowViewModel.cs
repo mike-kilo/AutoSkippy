@@ -113,4 +113,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         await Processor.Process(CurrentPayload);
     }
+
+    [RelayCommand]
+    public async Task AbortPayload() => Processor.IsBreakRequested = true;
 }
