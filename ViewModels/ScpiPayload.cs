@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -44,7 +45,22 @@ public partial class ScpiPayload : ViewModelBase
     [ObservableProperty]
     private string _preFetchAppliedCommands = DefaultPreFetchAppliedCommands;
 
-    public int PreFetchDelay => 0;
+    public int PreFetchDelay => CalculateDelay(PreFetchValueCommands, SetupLines);
+
+    private static bool IsInSet(string command, string[] commands) => commands.Any(c => command.StartsWith(c));
+
+    public static int CalculateDelay(string valueCommands, string source)
+    {
+        var rawCommands = valueCommands.Split(',');
+        var fixedValue = rawCommands.Sum(c => int.TryParse(c, out int cv) ? cv : 0);
+        var delayValue = source
+            .Split(Environment.NewLine)
+            .Where(l => IsInSet(l, rawCommands))
+            .DefaultIfEmpty()
+            .Sum(c => int.TryParse(c?.Split(' ').Skip(1).FirstOrDefault(), out int v) ? v : 0);
+
+        return fixedValue + delayValue;
+    }
 }
 
 [DataContract]
