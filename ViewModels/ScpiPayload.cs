@@ -47,7 +47,7 @@ public partial class ScpiPayload : ViewModelBase
 
     public int PreFetchDelay => CalculateDelay(PreFetchValueCommands, SetupLines);
 
-    private static bool IsInSet(string command, string[] commands) => commands.Any(c => command.StartsWith(c));
+    public static bool IsInSet(string command, string[] commands) => commands.Any(c => command.StartsWith(c));
 
     public static int CalculateDelay(string valueCommands, string source)
     {
