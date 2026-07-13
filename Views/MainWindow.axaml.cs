@@ -3,10 +3,7 @@ using AutoSkippy.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
-using System;
-using System.Diagnostics;
 using System.IO;
-using System.Text.Json;
 
 namespace AutoSkippy.Views;
 
@@ -44,24 +41,8 @@ public partial class MainWindow : Window
         if (files.Count != 1) return;
         vm.RecentFolder = Path.GetDirectoryName(files[0].Path.LocalPath) ?? string.Empty;
 
-        vm.CurrentPayload = new();
         vm.CurrentPayloadPath = files[0].Path.LocalPath;
-        try
-        {
-            using StreamReader sr = new(vm.CurrentPayloadPath);
-            var json = sr.ReadToEnd();
-
-            var pld = JsonSerializer.Deserialize<ScpiPayloadSerialisable>(json, JsonConfig.DeserialiserOptions);
-
-            if (pld is not null)
-            {
-                vm.CurrentPayload = pld.ToActual();
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex.ToString());
-        }
+        vm.CurrentPayload = await ScpiPayloadSerialisable.Load(vm.CurrentPayloadPath) is ScpiPayloadSerialisable pld ? pld.ToActual() : new();
     }
 
     private async void ButtonSaveAsClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -90,7 +71,7 @@ public partial class MainWindow : Window
 
         if (file.TryGetLocalPath() is string path)
         { 
-            MainWindowViewModel.SavePayloadToJson(vm.CurrentPayload, path); 
+            await vm.CurrentPayload.ToSerialisable().Save(path);
         }
     }
 

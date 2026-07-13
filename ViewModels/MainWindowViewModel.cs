@@ -3,10 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AutoSkippy.ViewModels;
@@ -52,23 +49,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => ResultsLines += e.Text.Trim() + Environment.NewLine;
 
-    public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName)
-    {
-        var json = JsonSerializer.Serialize(payload.ToSerialisable(), SourceGenerationContext.Default.ScpiPayloadSerialisable);
-
-        try
-        {
-            using var sw = new StreamWriter(fullFileName, false) { AutoFlush = true };
-
-            await sw.WriteAsync(json);
-            sw.Close();
-            sw.Dispose();
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine(e.ToString());
-        }
-    }
+    public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName) => await payload.ToSerialisable().Save(fullFileName);
 
     [RelayCommand]
     public void SavePayload()

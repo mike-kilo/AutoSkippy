@@ -1,7 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AutoSkippy.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace AutoSkippy.ViewModels;
 
@@ -62,4 +67,39 @@ public class ScpiPayloadSerialisable
         TeardownLines = TeardownLines ?? string.Empty,
         LoopCount = LoopCout,
     };
+
+    public async Task Save(string filename)
+    {
+        var json = JsonSerializer.Serialize(this, SourceGenerationContext.Default.ScpiPayloadSerialisable);
+
+        try
+        {
+            using var sw = new StreamWriter(filename, false) { AutoFlush = true };
+
+            await sw.WriteAsync(json);
+            sw.Close();
+            sw.Dispose();
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.ToString());
+        }
+    }
+
+    public static async Task<ScpiPayloadSerialisable?> Load(string filename)
+    {
+        try
+        {
+            using StreamReader sr = new(filename);
+            var json = sr.ReadToEnd();
+
+            return JsonSerializer.Deserialize<ScpiPayloadSerialisable>(json, JsonConfig.DeserialiserOptions);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.ToString());
+        }
+
+        return null;
+    }
 }
