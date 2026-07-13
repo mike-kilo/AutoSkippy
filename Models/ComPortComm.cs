@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -121,7 +121,7 @@ public partial class ComPortComm :ObservableObject
         {
             _cancellationTokenSource.TryReset();
             count = await Task.Run(() => count = _serialPort.Read(buffer, 0, 4096))
-                .ContinueWith(t => t.Result);
+                .ContinueWith(t => t.Status == TaskStatus.RanToCompletion ? t.Result : 0, TaskScheduler.FromCurrentSynchronizationContext());
         }
         catch (Exception e)
         {
