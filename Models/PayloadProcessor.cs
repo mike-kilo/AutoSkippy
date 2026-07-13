@@ -1,7 +1,6 @@
-﻿using AutoSkippy.ViewModels;
+using AutoSkippy.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AutoSkippy.Models;
@@ -33,12 +32,12 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
         var received = string.Empty;
         if (line.EndsWith('?'))
         {
-            Thread.Sleep(ComPortComm.TIMEOUT / 2);
+            await Task.Delay(ComPortComm.TIMEOUT / 2);
             received = await Communicator.ReadAsync();
         }
         else
         {
-            Thread.Sleep(ComPortComm.TIMEOUT);
+            await Task.Delay(ComPortComm.TIMEOUT);
         }
 
         Progressed?.Invoke(this, new EventArgs());
