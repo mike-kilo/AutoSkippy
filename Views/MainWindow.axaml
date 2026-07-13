@@ -22,7 +22,7 @@
 		<Label Content="Control your measurement equipment sequentially with SCPI"
 			   HorizontalAlignment="Center"
 			   FontWeight="DemiBold"/>
-		<Grid Grid.Row="1" RowDefinitions="Auto,Auto,2*,2*,*,Auto,Auto" ColumnDefinitions="*,*" Margin="3">
+		<Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,2*,Auto,2*,Auto,*,Auto,Auto" ColumnDefinitions="*,*" Margin="3">
 			<StackPanel Orientation="Horizontal" Margin="3" >
 				<TextBlock Text="Select COM port:" VerticalAlignment="Center" Margin="3"/>
 				<ComboBox Width="100" Margin="3"
@@ -52,19 +52,16 @@
 						 HorizontalAlignment="Stretch" Margin="3" />
 				<Button Grid.Column="2" Content="Browse..." Click="ButtonBrowseClick" />
 			</Grid>
-			<Grid Grid.Row="2" RowDefinitions="Auto,*" 
+			<TextBlock Grid.Row="2" Text="Setup" Margin="3,0"/>
+			<TextBox Grid.Row="3"
+					 Text="{Binding CurrentPayload.SetupLines, Mode=TwoWay, FallbackValue={}}"
+					 AcceptsReturn="True" TextWrapping="Wrap"
+	 			     IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+					 VerticalAlignment="Stretch" Margin="3"
+					 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+			<Grid Grid.Row="4" RowDefinitions="Auto,*" ColumnDefinitions="Auto,*,Auto,Auto" 
 				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
-				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
-				<TextBlock Text="Setup" />
-				<TextBox Grid.Row="1" 
-						 Text="{Binding CurrentPayload.SetupLines, Mode=TwoWay, FallbackValue={}}"
-						 AcceptsReturn="True" TextWrapping="Wrap" 
-						 VerticalAlignment="Stretch" 
-						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
-			</Grid>
-			<Grid Grid.Row="3" RowDefinitions="Auto,*" ColumnDefinitions="Auto,*,Auto,Auto" 
-				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
-				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
+				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3,0" >
 				<TextBlock Text="Loop" VerticalAlignment="Bottom" />
 				<TextBlock Grid.Column="2" Text="Repeat:" VerticalAlignment="Center" />
 				<NumericUpDown Grid.Column="3" 
@@ -73,23 +70,21 @@
 							   VerticalAlignment="Center" Margin="3" Width="70" 
 							   HorizontalContentAlignment="Right"
 							   FormatString="N0" ParsingNumberStyle="Integer" />
-				<TextBox Grid.Row="1" Grid.ColumnSpan="4"
-						 Text="{Binding CurrentPayload.LoopLines, Mode=TwoWay, FallbackValue={}}"
-						 AcceptsReturn="True" TextWrapping="Wrap" 
-						 VerticalAlignment="Stretch" 
-						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="4" RowDefinitions="Auto,*"
-				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
-				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
-				<TextBlock Text="Teardown" />
-				<TextBox Grid.Row="1" 
-						 Text="{Binding CurrentPayload.TeardownLines, Mode=TwoWay, FallbackValue={}}"
-						 AcceptsReturn="True" TextWrapping="Wrap" 
-						 VerticalAlignment="Stretch" 
-						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
-			</Grid>
-			<Grid Grid.Row="5" ColumnDefinitions="Auto,3,Auto,6,*" 
+			<TextBox Grid.Row="5"
+					 Text="{Binding CurrentPayload.LoopLines, Mode=TwoWay, FallbackValue={}}"
+					 AcceptsReturn="True" TextWrapping="Wrap"
+				     IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+					 VerticalAlignment="Stretch" Margin="3"
+					 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+			<TextBlock Grid.Row="6" Text="Teardown" Margin="3,0" />
+			<TextBox Grid.Row="7" 
+						Text="{Binding CurrentPayload.TeardownLines, Mode=TwoWay, FallbackValue={}}"
+						AcceptsReturn="True" TextWrapping="Wrap" 
+						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
+						VerticalAlignment="Stretch" Margin="3"
+						ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+			<Grid Grid.Row="8" ColumnDefinitions="Auto,3,Auto,6,*" 
 				  IsEnabled="{Binding Communicator.IsConnected}"
 				  Margin="3" >
 				<Button Content="Run" Command="{Binding RunPayloadCommand}" 
@@ -104,7 +99,7 @@
 							 Value="{Binding ProgressSteps}"
 							 Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
 			</Grid>
-			<StackPanel Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" Grid.Row="6">
+			<StackPanel Grid.Row="9" Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" >
 				<Button Grid.Row="2"
 						Content="Save"
 						Command="{Binding SavePayloadCommand}"
@@ -115,7 +110,7 @@
 						Click="ButtonSaveAsClick"
 						Width="120" HorizontalContentAlignment="Center" />
 			</StackPanel>
-			<Grid Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
+			<Grid Grid.Row="2" Grid.RowSpan="6" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
 				<TextBox Grid.Row="1"
 						 Text="{Binding ResultsLines}"
@@ -124,7 +119,7 @@
 						 VerticalAlignment="Stretch"
 						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
 			</Grid>
-			<Grid Grid.Row="5" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
+			<Grid Grid.Row="8" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
 				<Button Grid.Column="1" Content="Copy" 
 						Click="ButtonCopyClick"
 						Width="100" HorizontalContentAlignment="Center" />
