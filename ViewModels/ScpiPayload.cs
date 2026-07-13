@@ -12,8 +12,12 @@ namespace AutoSkippy.ViewModels;
 
 public partial class ScpiPayload : ViewModelBase
 {
+    public static readonly string DefaultPreFetchValueCommands = "CONF:TCH,CONF:TDW,CONF:TME,CONF:TDIS,4";
+    public static readonly string DefaultPreFetchAppliedCommands = "FETC";
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
+    [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
     private string _setupLines = string.Empty;
 
     [ObservableProperty]
@@ -32,6 +36,15 @@ public partial class ScpiPayload : ViewModelBase
         SetupLines.Split(Environment.NewLine).Length + 
         LoopCount * LoopLines.Split(Environment.NewLine).Length +
         TeardownLines.Split(Environment.NewLine).Length;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
+    private string _preFetchValueCommands = DefaultPreFetchValueCommands;
+
+    [ObservableProperty]
+    private string _preFetchAppliedCommands = DefaultPreFetchAppliedCommands;
+
+    public int PreFetchDelay => 0;
 }
 
 [DataContract]
@@ -49,15 +62,23 @@ public class ScpiPayloadSerialisable
     [DataMember]
     public int LoopCout { get; set; }
 
+    [DataMember]
+    public string? PreFetchValueCommands { get; set; }
+
+    [DataMember]
+    public string? PreFetchAppliedCommands { get; set; }
+
     [JsonConstructor]
     public ScpiPayloadSerialisable() { }
 
-    public ScpiPayloadSerialisable(string? setupLines, string? loopLines, string? teardownLines, int loopCout)
+    public ScpiPayloadSerialisable(string? setupLines, string? loopLines, string? teardownLines, int loopCout, string? preFetchValueCommands, string? preFetchAppliedCommands)
     {
         SetupLines = setupLines;
         LoopLines = loopLines;
         TeardownLines = teardownLines;
         LoopCout = loopCout;
+        PreFetchValueCommands = preFetchValueCommands;
+        PreFetchAppliedCommands = preFetchAppliedCommands;
     }
 
     public ScpiPayload ToActual() => new()
@@ -66,6 +87,9 @@ public class ScpiPayloadSerialisable
         LoopLines = LoopLines ?? string.Empty,
         TeardownLines = TeardownLines ?? string.Empty,
         LoopCount = LoopCout,
+
+        PreFetchValueCommands = PreFetchValueCommands ?? ScpiPayload.DefaultPreFetchValueCommands,
+        PreFetchAppliedCommands = PreFetchAppliedCommands ?? ScpiPayload.DefaultPreFetchAppliedCommands,
     };
 
     public async Task Save(string filename)

@@ -27,7 +27,8 @@
 				<TextBlock Text="Select COM port:" VerticalAlignment="Center" Margin="3"/>
 				<ComboBox Width="100" Margin="3"
 						  ItemsSource="{Binding AvailableComPorts}"
-						  SelectedItem="{Binding SelectedComPort, Mode=TwoWay} "/>
+						  SelectedItem="{Binding SelectedComPort, Mode=TwoWay}" 
+						  VerticalAlignment="Center"/>
 				<Button Command="{Binding RefreshComPortsCommand}" Margin="3" 
 						ToolTip.Tip="Refresh">
 					<Button.Content>
@@ -49,7 +50,7 @@
 						 Text="{Binding CurrentPayloadPath}"
 						 IsReadOnly="True"
 						 ToolTip.Tip="{Binding CurrentPayloadPath}"
-						 HorizontalAlignment="Stretch" Margin="3" />
+						 HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="3" />
 				<Button Grid.Column="2" Content="Browse..." Click="ButtonBrowseClick" />
 			</Grid>
 			<TextBlock Grid.Row="2" Text="Setup" Margin="3,0"/>
@@ -110,6 +111,27 @@
 						Click="ButtonSaveAsClick"
 						Width="120" HorizontalContentAlignment="Center" />
 			</StackPanel>
+			<Grid Grid.Column="1" Grid.RowSpan="2" Margin="3">
+				<HeaderedContentControl Header="Pre-fetch delay settings">
+					<Grid RowDefinitions="Auto,3,Auto,3,Auto" ColumnDefinitions="Auto,*" Margin="3">
+						<TextBlock Text="Value commands" VerticalAlignment="Center" >
+							<ToolTip.Tip>
+								<StackPanel>
+									<TextBlock Text="Comma separated values," />
+									<TextBlock Text="commands (in 'Setup' field) that are parsed for delay time." />
+									<TextBlock Text="Or an integer for fixed value." />
+									<TextBlock Text="All added up." />
+								</StackPanel>
+							</ToolTip.Tip>
+						</TextBlock>
+						<TextBlock Text="Delayed commands" Grid.Row="2" ToolTip.Tip="Commands, before which the delay is applied." VerticalAlignment="Center" />
+						<TextBlock Text="Calculated delay [s]" Grid.Row="4" VerticalAlignment="Center" />
+						<TextBox Grid.Column="1" Text="{Binding CurrentPayload.PreFetchValueCommands, Mode=TwoWay}" />
+						<TextBox Grid.Row="2" Text="{Binding CurrentPayload.PreFetchAppliedCommands, Mode=TwoWay}" Grid.Column="1" />
+						<TextBlock Grid.Row="4" Text="{Binding CurrentPayload.PreFetchDelay}" Grid.Column="1" Margin="3" />
+					</Grid>
+				</HeaderedContentControl>
+			</Grid>
 			<Grid Grid.Row="2" Grid.RowSpan="6" Grid.Column="1" RowDefinitions="Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3" >
 				<TextBlock Text="Results" />
 				<TextBox Grid.Row="1"
@@ -124,7 +146,7 @@
 						Click="ButtonCopyClick"
 						Width="100" HorizontalContentAlignment="Center" />
 				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
-			</Grid>
+			</Grid> 
 		</Grid>
 		<Border Grid.Row="3" 
 				BorderThickness="1" BorderBrush="{StaticResource SystemControlBackgroundBaseHighBrush}" Background="{StaticResource SystemControlBackgroundBaseLowBrush}" 
