@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,7 +15,7 @@ public partial class ComPortComm :ObservableObject
 
     private CancellationTokenSource _cancellationTokenSource = new(TIMEOUT);
 
-    public static string[] GetPorts() => SerialPort.GetPortNames();
+    public static string[] GetPorts() => [ .. SerialPort.GetPortNames().Distinct()];
 
     private SerialPort? _serialPort;
 
