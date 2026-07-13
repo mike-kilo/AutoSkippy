@@ -1,6 +1,7 @@
-using AutoSkippy.ViewModels;
+﻿using AutoSkippy.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AutoSkippy.Models;
@@ -67,6 +68,16 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
             if (IsBreakRequested) break;
             foreach (var line in payload.LoopLines.Split(Environment.NewLine))
             {
+                var trimmed = new string([ .. line.TakeWhile(c => c != '?' && c != ' ')]);
+                if (trimmed is not null && ScpiPayload.IsInSet(trimmed, payload.PreFetchAppliedCommands.Split(Environment.NewLine)))
+                {
+                    for (int w = 0; w < payload.PreFetchDelay; w++)
+                    {
+                        if (IsBreakRequested) break;
+                        await Task.Delay(1000);
+                    }
+                }
+
                 if (IsBreakRequested) break;
                 await ProcessScpiLine(line);
             }
