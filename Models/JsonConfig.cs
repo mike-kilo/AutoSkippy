@@ -24,5 +24,7 @@ public static class JsonConfig
         LoopLines = payload.LoopLines,
         TeardownLines = payload.TeardownLines,
         LoopCout = payload.LoopCount,
+        PreFetchValueCommands = payload.PreFetchValueCommands,
+        PreFetchAppliedCommands = payload.PreFetchAppliedCommands,
     };
 }
