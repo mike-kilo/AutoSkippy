@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -25,7 +25,12 @@ public class AppSettings
 
         try
         {
-            using var sw = new StreamWriter(SETTINGSLOCATION, false) { AutoFlush = true };
+            if (Path.GetDirectoryName(SETTINGSLOCATION) is string p && !Directory.Exists(p))
+            {
+                Directory.CreateDirectory(p);
+            }
+
+            using var sw = new StreamWriter(SETTINGSLOCATION, new FileStreamOptions() { Access = FileAccess.Write, Mode = FileMode.OpenOrCreate }) { AutoFlush = true };
 
             await sw.WriteAsync(json);
             sw.Close();
