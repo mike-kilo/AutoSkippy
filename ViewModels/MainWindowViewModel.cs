@@ -1,4 +1,4 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -96,4 +96,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [RelayCommand]
     public async Task AbortPayload() => Processor.IsBreakRequested = true;
+
+    public async Task<IStorageFolder?> GetPayloadFolder() =>
+        StorageProvider is null ? null :
+        !string.IsNullOrEmpty(RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
+        !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await StorageProvider.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
+        await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 }
