@@ -62,17 +62,31 @@ public partial class MainWindow : Window
         if (file is null) return;
 
         vm.RecentFolder = Path.GetDirectoryName(file.Path.LocalPath) ?? string.Empty;
+        vm.Settings.RecentUsedFolder = vm.RecentFolder;
 
         if (file.TryGetLocalPath() is string path)
         { 
-            await vm.CurrentPayload.ToSerialisable().Save(path);
+            await MainWindowViewModel.SavePayloadToJson(vm.CurrentPayload, path);
+            await vm.Settings.Save();
         }
     }
 
-    private void WindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void WindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (this.DataContext is not MainWindowViewModel vm) return;
+        if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
+
+        vm.StorageProvider = topLevel.StorageProvider;
+        if (await AppSettings.Load() is AppSettings s)
+        { 
+            vm.Settings = s; 
+        }
+
         vm.RefreshComPorts();
+        if (vm.AvailableComPorts.Contains(vm.Settings.RecentUsedPort))
+        {
+            vm.SelectedComPort = vm.Settings.RecentUsedPort;
+        }
     }
 
     private async void ButtonCopyClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
