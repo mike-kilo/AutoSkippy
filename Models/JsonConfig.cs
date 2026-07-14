@@ -6,6 +6,7 @@ namespace AutoSkippy.Models;
 
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true, WriteIndented = true, GenerationMode = JsonSourceGenerationMode.Default)]
 [JsonSerializable(typeof(ScpiPayloadSerialisable), GenerationMode = JsonSourceGenerationMode.Default)]
+[JsonSerializable(typeof(AppSettings), GenerationMode = JsonSourceGenerationMode.Default)]
 public partial class SourceGenerationContext : JsonSerializerContext { }
 
 public static class JsonConfig

@@ -1,4 +1,5 @@
 ﻿using AutoSkippy.Models;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -38,6 +39,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private int _progressSteps = 0;
 
+    public AppSettings Settings { get; set; } = new();
+
+    public IStorageProvider? StorageProvider { get; set; }
+
     public MainWindowViewModel()
     {
         Processor = new(Communicator);
@@ -49,14 +54,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => ResultsLines += e.Text.Trim() + Environment.NewLine;
 
-    public static async void SavePayloadToJson(ScpiPayload payload, string fullFileName) => await payload.ToSerialisable().Save(fullFileName);
+    public static async Task SavePayloadToJson(ScpiPayload payload, string fullFileName) => await payload.ToSerialisable().Save(fullFileName);
 
     [RelayCommand]
-    public void SavePayload()
+    public async Task SavePayload()
     {
         if (CurrentPayload is ScpiPayload p && !string.IsNullOrEmpty(CurrentPayloadPath))
         {
-            SavePayloadToJson(p, CurrentPayloadPath);
+            await SavePayloadToJson(p, CurrentPayloadPath);
+            
+            Settings.RecentUsedFolder = RecentFolder;
+            await Settings.Save();
         }
     }
 
@@ -76,10 +84,14 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool IsComPortSelected() => !string.IsNullOrEmpty(SelectedComPort);
 
     [RelayCommand(CanExecute = nameof(IsComPortSelected))]
-    public void ConnectCom()
+    public async Task ConnectCom()
     {
         if (string.IsNullOrEmpty(SelectedComPort)) return;
-        Communicator.OpenConnection(SelectedComPort);
+        if (Communicator.OpenConnection(SelectedComPort))
+        {
+            Settings.RecentUsedPort = SelectedComPort;
+            await Settings.Save();
+        }
     }
 
     [RelayCommand]
@@ -96,4 +108,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [RelayCommand]
     public async Task AbortPayload() => Processor.IsBreakRequested = true;
+
+    public async Task<IStorageFolder?> GetPayloadFolder() =>
+        StorageProvider is null ? null :
+        !string.IsNullOrEmpty(RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
+        !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await StorageProvider.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
+        await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 }

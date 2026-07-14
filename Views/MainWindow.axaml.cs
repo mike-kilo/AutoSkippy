@@ -25,15 +25,12 @@ public partial class MainWindow : Window
         if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
         if (this.DataContext is not MainWindowViewModel vm) return;
 
-        var suggestedFolder = !string.IsNullOrEmpty(vm.RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(vm.RecentFolder) is IStorageFolder sf ?
-                sf : await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-
         // Start async operation to open the dialog.
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Open SCPI payload",
             AllowMultiple = false,
-            SuggestedStartLocation = suggestedFolder,
+            SuggestedStartLocation = await vm.GetPayloadFolder(),
             FileTypeFilter = [ SCPIPayload, FilePickerFileTypes.All ],
             SuggestedFileType = SCPIPayload,
         });
@@ -50,9 +47,6 @@ public partial class MainWindow : Window
         if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
         if (this.DataContext is not MainWindowViewModel vm) return;
 
-        var suggestedFolder = !string.IsNullOrEmpty(vm.RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(vm.RecentFolder) is IStorageFolder sf ?
-        sf : await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-
         // Start async operation to open the dialog.
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
@@ -61,24 +55,38 @@ public partial class MainWindow : Window
             ShowOverwritePrompt = true,
             SuggestedFileName = Path.GetFileName(vm.CurrentPayloadPath),
             FileTypeChoices = [SCPIPayload, FilePickerFileTypes.All],
-            SuggestedStartLocation = suggestedFolder,
+            SuggestedStartLocation = await vm.GetPayloadFolder(),
             SuggestedFileType = SCPIPayload,
         });
 
         if (file is null) return;
 
         vm.RecentFolder = Path.GetDirectoryName(file.Path.LocalPath) ?? string.Empty;
+        vm.Settings.RecentUsedFolder = vm.RecentFolder;
 
         if (file.TryGetLocalPath() is string path)
         { 
-            await vm.CurrentPayload.ToSerialisable().Save(path);
+            await MainWindowViewModel.SavePayloadToJson(vm.CurrentPayload, path);
+            await vm.Settings.Save();
         }
     }
 
-    private void WindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void WindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (this.DataContext is not MainWindowViewModel vm) return;
+        if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
+
+        vm.StorageProvider = topLevel.StorageProvider;
+        if (await AppSettings.Load() is AppSettings s)
+        { 
+            vm.Settings = s; 
+        }
+
         vm.RefreshComPorts();
+        if (vm.AvailableComPorts.Contains(vm.Settings.RecentUsedPort))
+        {
+            vm.SelectedComPort = vm.Settings.RecentUsedPort;
+        }
     }
 
     private async void ButtonCopyClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
