@@ -6,12 +6,18 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <AssemblyVersion>0.3.0.0</AssemblyVersion>
-    <FileVersion>0.3.0.0</FileVersion>
+    <AssemblyVersion>0.4.0.0</AssemblyVersion>
+    <FileVersion>0.4.0.0</FileVersion>
     <ApplicationIcon>AutoSkippyIcon.ico</ApplicationIcon>
     <PackageIcon>AutoSkippyIcon.png</PackageIcon>
   </PropertyGroup>
 
+  <Target Name="Package" AfterTargets="Publish">
+    <Exec Command="SignExecutable.bat $(PublishDir) $(ProjectName)" />
+    <Exec Command="GenerateMD5Hashes.bat $(PublishDir)" />
+	<ZipDirectory Overwrite="true" SourceDirectory="$(PublishDir)" DestinationFile="$(PublishDir)/../$(ProjectName)_$(AssemblyVersion).zip" />
+  </Target>
+  
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
