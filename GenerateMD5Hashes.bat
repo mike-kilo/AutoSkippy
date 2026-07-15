@@ -1,4 +1,7 @@
 @echo off
+IF [%1]==[] GOTO :EOF
+IF NOT EXIST %1\NUL GOTO :EOF
+
 set curDir=%cd%
 set hashesFile=md5hashes.txt
 cd %1
