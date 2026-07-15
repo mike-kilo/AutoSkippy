@@ -12,6 +12,10 @@
     <PackageIcon>AutoSkippyIcon.png</PackageIcon>
   </PropertyGroup>
 
+  <Target Name="Package" AfterTargets="Publish">
+	<ZipDirectory Overwrite="true" SourceDirectory="$(PublishDir)" DestinationFile="$(PublishDir)/../$(ProjectName)_$(AssemblyVersion).zip" />
+  </Target>
+  
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
