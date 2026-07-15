@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <Target Name="Package" AfterTargets="Publish">
+    <Exec Command="GenerateMD5Hashes.bat $(PublishDir)" />
 	<ZipDirectory Overwrite="true" SourceDirectory="$(PublishDir)" DestinationFile="$(PublishDir)/../$(ProjectName)_$(AssemblyVersion).zip" />
   </Target>
   
