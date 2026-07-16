@@ -1,4 +1,4 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ public partial class ScpiPayload : ViewModelBase
 
     public int PreFetchDelay => CalculateDelay(PreFetchValueCommands, SetupLines);
 
-    public static bool IsInSet(string command, IEnumerable<string> commands) => commands.Any(c => command.StartsWith(c));
+    public static bool IsInSet(string command, IEnumerable<string> commands) => commands.Count() > 0 && commands.Any(c => !string.IsNullOrEmpty(c.Trim()) && command.Trim().StartsWith(c));
 
     public static int CalculateDelay(string valueCommands, string source)
     {
