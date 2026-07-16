@@ -1,6 +1,7 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,22 +17,23 @@ public partial class ScpiPayload : ViewModelBase
     public static readonly string DefaultPreFetchValueCommands = "CONF:TCH,CONF:TDW,CONF:TME,CONF:TDIS,4";
     public static readonly string DefaultPreFetchAppliedCommands = "FETC";
 
+    public static event EventHandler? PayloadChanged;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
     [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
-    private string _setupLines = string.Empty;
+    public partial string SetupLines { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private string _loopLines = string.Empty;
+    public partial string LoopLines { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private int _loopCount = 1;
-
+    public partial int LoopCount { get; set; } = 1;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private string _teardownLines = string.Empty;
+    public partial string TeardownLines { get; set; } = string.Empty;
 
     public int StepsCount => 
         SetupLines.Split(Environment.NewLine).Length + 
@@ -40,27 +42,41 @@ public partial class ScpiPayload : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
-    private string _preFetchValueCommands = DefaultPreFetchValueCommands;
+    public partial string PreFetchValueCommands { get; set; } = DefaultPreFetchValueCommands;
 
     [ObservableProperty]
-    private string _preFetchAppliedCommands = DefaultPreFetchAppliedCommands;
+    public partial string PreFetchAppliedCommands { get; set; } = DefaultPreFetchAppliedCommands;
 
     public int PreFetchDelay => CalculateDelay(PreFetchValueCommands, SetupLines);
 
-    public static bool IsInSet(string command, string[] commands) => commands.Any(c => command.StartsWith(c));
+    public static bool IsInSet(string command, IEnumerable<string> commands) => commands.Count() > 0 && commands.Any(c => !string.IsNullOrEmpty(c.Trim()) && command.Trim().StartsWith(c));
 
     public static int CalculateDelay(string valueCommands, string source)
     {
-        var rawCommands = valueCommands.Split(',');
+        var rawCommands = valueCommands.Split(',')
+            .DefaultIfEmpty()
+            .Select(c => c?.Trim())
+            .Where(c => c is not null && c.Trim().Length > 0)
+            .DefaultIfEmpty()
+            .Select(s =>  s ?? string.Empty);
         var fixedValue = rawCommands.Sum(c => int.TryParse(c, out int cv) ? cv : 0);
         var delayValue = source
             .Split(Environment.NewLine)
-            .Where(l => IsInSet(l, rawCommands))
+            .DefaultIfEmpty()
+            .Where(l => l is not null && IsInSet(l.Trim(), rawCommands))
             .DefaultIfEmpty()
             .Sum(c => int.TryParse(c?.Split(' ').Skip(1).FirstOrDefault(), out int v) ? v : 0);
 
         return fixedValue + delayValue;
     }
+
+    partial void OnSetupLinesChanged(string value) => PayloadChanged?.Invoke(this, new EventArgs()); 
+
+    partial void OnLoopLinesChanged(string value) => PayloadChanged?.Invoke(this, new());
+
+    partial void OnLoopCountChanged(int value) => PayloadChanged?.Invoke(this, new());
+
+    partial void OnTeardownLinesChanged(string value) => PayloadChanged?.Invoke(this, new());
 }
 
 [DataContract]

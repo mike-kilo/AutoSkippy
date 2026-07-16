@@ -18,17 +18,20 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
 
     public event EventHandler? Progressed;
 
-    [ObservableProperty]
-    private bool _isProcessing = false;
+    public event EventHandler<string>? RecentCommand;
 
     [ObservableProperty]
-    private bool _isBreakRequested = false;
+    public partial bool IsProcessing { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool IsBreakRequested { get; set; } = false;
 
     public ComPortComm Communicator { get; private set; } = communicator;
 
     private async Task<string?> ProcessScpiLine(string line)
     {
         if (!Communicator.IsConnected) return null;
+        RecentCommand?.Invoke(this, line);
         await Task.Run(() => Communicator.Send(line));
         var received = string.Empty;
         if (line.EndsWith('?'))
@@ -74,6 +77,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
                     for (int w = 0; w < payload.PreFetchDelay; w++)
                     {
                         if (IsBreakRequested) break;
+                        RecentCommand?.Invoke(this, $"Pre-fetch delay, {payload.PreFetchDelay - w} seconds left.");
                         await Task.Delay(1000);
                     }
                 }
@@ -84,6 +88,23 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
         }
 
         foreach (var line in payload.TeardownLines.Split(Environment.NewLine))
+        {
+            if (IsBreakRequested) break;
+            await ProcessScpiLine(line);
+        }
+
+        IsProcessing = false;
+        IsBreakRequested = false;
+    }
+
+    public async Task Process(string[] lines)
+    {
+        if (!Communicator.IsConnected) return;
+        if (lines is null) return;
+
+        IsProcessing = true;
+
+        foreach (var line in lines)
         {
             if (IsBreakRequested) break;
             await ProcessScpiLine(line);

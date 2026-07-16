@@ -59,7 +59,13 @@
 					 AcceptsReturn="True" TextWrapping="Wrap"
 	 			     IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 					 VerticalAlignment="Stretch" Margin="3"
-					 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+					 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" >
+				<TextBox.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="Run once" Command="{Binding RunOncePayloadSectionCommand}" CommandParameter="{Binding CurrentPayload.SetupLines}" />
+					</ContextMenu>
+				</TextBox.ContextMenu>
+			</TextBox>
 			<Grid Grid.Row="4" RowDefinitions="Auto,*" ColumnDefinitions="Auto,*,Auto,Auto" 
 				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 				  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="3,0" >
@@ -77,30 +83,44 @@
 					 AcceptsReturn="True" TextWrapping="Wrap"
 				     IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 					 VerticalAlignment="Stretch" Margin="3"
-					 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+					 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" >
+				<TextBox.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="Run once" Command="{Binding RunOncePayloadSectionCommand}" CommandParameter="{Binding CurrentPayload.LoopLines}" />
+					</ContextMenu>
+				</TextBox.ContextMenu>
+			</TextBox>
 			<TextBlock Grid.Row="6" Text="Teardown" Margin="3,0" />
 			<TextBox Grid.Row="7" 
 						Text="{Binding CurrentPayload.TeardownLines, Mode=TwoWay, FallbackValue={}}"
 						AcceptsReturn="True" TextWrapping="Wrap" 
 						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 						VerticalAlignment="Stretch" Margin="3"
-						ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
-			<Grid Grid.Row="8" ColumnDefinitions="Auto,3,Auto,6,*" 
+						ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" >
+				<TextBox.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="Run once" Command="{Binding RunOncePayloadSectionCommand}" CommandParameter="{Binding CurrentPayload.TeardownLines}" />
+					</ContextMenu>
+				</TextBox.ContextMenu>
+			</TextBox>
+			<Grid Grid.Row="8" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,3,Auto,6,*" 
 				  IsEnabled="{Binding Communicator.IsConnected}"
 				  Margin="3" >
 				<Button Content="Run" Command="{Binding RunPayloadCommand}" 
 						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
-						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+						Width="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
 				<Button Content="Abort" Command="{Binding AbortPayloadCommand}" 
                         Grid.Column="2"
 						IsEnabled="{Binding Processor.IsProcessing}"
-						Width="59" HorizontalContentAlignment="Center" />
+					Width="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
 				<ProgressBar Grid.Column="4" VerticalAlignment="Stretch" 
 							 ShowProgressText="True" 
 							 Value="{Binding ProgressSteps}"
 							 Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
+				<TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="Recent command" HorizontalAlignment="Right" VerticalAlignment="Center" />
+				<TextBox Grid.Row="2" Grid.Column="4" IsReadOnly="True" Text="{Binding RecentCommand}" />
 			</Grid>
-			<StackPanel Grid.Row="9" Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" >
+			<StackPanel Grid.Row="9" Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" Margin="3" >
 				<Button Grid.Row="2"
 						Content="Save"
 						Command="{Binding SavePayloadCommand}"
@@ -139,13 +159,27 @@
 						 IsReadOnly="True"
 						 AcceptsReturn="True" TextWrapping="Wrap"
 						 VerticalAlignment="Stretch"
-						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" >
+					<TextBox.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="Copy selected" 
+									  Command="{Binding CopyTextCommand}" CommandParameter="{Binding $parent[TextBox].SelectedText}" 
+									  IsEnabled="{Binding $parent[TextBox].SelectedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+						</ContextMenu>
+					</TextBox.ContextMenu>
+				</TextBox>
 			</Grid>
-			<Grid Grid.Row="8" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
-				<Button Grid.Column="1" Content="Copy" 
-						Click="ButtonCopyClick"
-						Width="100" HorizontalContentAlignment="Center" />
-				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
+			<Grid Grid.Row="8" Grid.Column="1" RowDefinitions="Auto,3,Auto" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
+				<Button Grid.Column="1" Content="Dots to commas"
+						Command="{Binding DotsToCommasCommand}"
+						Width="150" HorizontalContentAlignment="Center" />
+				<Button Grid.Column="3" Content="Commas to dots"
+						Command="{Binding CommasToDotsCommand}"
+						Width="150" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="1" Content="Copy all" 
+						Command="{Binding CopyTextCommand}" CommandParameter="{Binding ResultsLines}" 
+						Width="100" HorizontalAlignment="Right" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
 			</Grid> 
 		</Grid>
 		<Border Grid.Row="3" 

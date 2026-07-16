@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace AutoSkippy.Models;
 
-public partial class ComPortComm :ObservableObject
+public partial class ComPortComm : ObservableObject
 {
     public static readonly int TIMEOUT = 1000;
 
-    private CancellationTokenSource _cancellationTokenSource = new(TIMEOUT);
+    private readonly CancellationTokenSource _cancellationTokenSource = new(TIMEOUT);
 
     public static string[] GetPorts() => [ .. SerialPort.GetPortNames().Distinct()];
 
     private SerialPort? _serialPort;
 
     [ObservableProperty]
-    private bool _isConnected = false;
+    public partial bool IsConnected { get; set; } = false;
 
     public bool OpenConnection(string portName, int baudRate = 9600, bool rts = false)
     {

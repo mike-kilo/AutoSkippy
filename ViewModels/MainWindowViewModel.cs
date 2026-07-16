@@ -1,4 +1,6 @@
 ﻿using AutoSkippy.Models;
+using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,19 +16,19 @@ public partial class MainWindowViewModel : ViewModelBase
     public static string VersionNumber => Assembly.GetExecutingAssembly()?.GetName().Version?.ToString() ?? "Unknown";
 
     [ObservableProperty]
-    private ScpiPayload _currentPayload = new();
+    public partial ScpiPayload CurrentPayload { get; set; } = new();
 
     [ObservableProperty]
-    private string _currentPayloadPath = string.Empty;
+    public partial string CurrentPayloadPath { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _resultsLines = string.Empty;
+    public partial string ResultsLines { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _recentFolder = string.Empty;
+    public partial string RecentFolder { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private ComPortComm _communicator = new();
+    public partial ComPortComm Communicator { get; set; } = new();
 
     public ObservableCollection<string> AvailableComPorts { get; private set; } = [];
 
@@ -34,21 +36,31 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectComCommand))]
-    private string? _selectedComPort = string.Empty;
+    public partial string? SelectedComPort { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private int _progressSteps = 0;
+    public partial int ProgressSteps { get; set; } = 0;
+
+    [ObservableProperty]
+    public partial string RecentCommand { get; set; } = string.Empty;
 
     public AppSettings Settings { get; set; } = new();
 
-    public IStorageProvider? StorageProvider { get; set; }
+    public TopLevel? MainVindowTopLevel { get; set;  }
 
     public MainWindowViewModel()
     {
         Processor = new(Communicator);
         Processor.Progressed += ProcessorProgressed;
         Processor.LineReceived += ProcessorLineReceived;
+        Processor.RecentCommand += ProcessorRecentCommand;
+
+        ScpiPayload.PayloadChanged += CurrentPayloadChanged;
     }
+
+    private void CurrentPayloadChanged(object? sender, EventArgs e) => ProgressSteps = 0;
+
+    private void ProcessorRecentCommand(object? sender, string e) => RecentCommand = e;
 
     private void ProcessorProgressed(object? sender, EventArgs e) => ProgressSteps++;
 
@@ -110,8 +122,34 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task AbortPayload() => Processor.IsBreakRequested = true;
 
     public async Task<IStorageFolder?> GetPayloadFolder() =>
-        StorageProvider is null ? null :
-        !string.IsNullOrEmpty(RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
-        !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await StorageProvider.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
-        await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+        MainVindowTopLevel?.StorageProvider is not IStorageProvider sp ? null :
+        !string.IsNullOrEmpty(RecentFolder) && await sp.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
+        !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await sp.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
+        await sp.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+    [RelayCommand]
+    public async Task RunOncePayloadSection(object? parameter)
+    {
+        if (parameter is string linesRaw && linesRaw.Split(Environment.NewLine) is string[] lines && lines.Length > 0)
+        {
+            await Processor.Process(lines);
+        }
+    }
+
+    [RelayCommand]
+    public async Task CopyText(object? parameter)
+    {
+        if (parameter is not string text) return;
+        if (MainVindowTopLevel?.Clipboard is not IClipboard clipboard) return;
+
+        await clipboard.SetTextAsync(text);
+    }
+
+    [RelayCommand]
+    public void DotsToCommas() => ResultsLines = ResultsLines.Replace('.', ',');
+
+    [RelayCommand]
+    public void CommasToDots() => ResultsLines = ResultsLines.Replace(',', '.');
+
+    partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
 }

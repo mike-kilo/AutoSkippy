@@ -10,7 +10,6 @@ set hashesFile=md5hashes.txt
 
 cd %1
 
-@echo on
 %signtool% sign /fd SHA256 /n "MiKoSoft" ".\%2.exe"
 rem Allow signing to settle down by waiting 5 seconds
 rem TIMEOUT /T 5 /NOBREAK > NUL
