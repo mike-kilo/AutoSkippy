@@ -1,4 +1,4 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
@@ -19,19 +19,18 @@ public partial class ScpiPayload : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
     [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
-    private string _setupLines = string.Empty;
+    public partial string SetupLines { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private string _loopLines = string.Empty;
+    public partial string LoopLines { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private int _loopCount = 1;
-
+    public partial int LoopCount { get; set; } = 1;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
-    private string _teardownLines = string.Empty;
+    public partial string TeardownLines { get; set; } = string.Empty;
 
     public int StepsCount => 
         SetupLines.Split(Environment.NewLine).Length + 
@@ -40,10 +39,10 @@ public partial class ScpiPayload : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
-    private string _preFetchValueCommands = DefaultPreFetchValueCommands;
+    public partial string PreFetchValueCommands { get; set; } = DefaultPreFetchValueCommands;
 
     [ObservableProperty]
-    private string _preFetchAppliedCommands = DefaultPreFetchAppliedCommands;
+    public partial string PreFetchAppliedCommands { get; set; } = DefaultPreFetchAppliedCommands;
 
     public int PreFetchDelay => CalculateDelay(PreFetchValueCommands, SetupLines);
 
