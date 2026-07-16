@@ -76,7 +76,7 @@ public partial class MainWindow : Window
         if (this.DataContext is not MainWindowViewModel vm) return;
         if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
 
-        vm.StorageProvider = topLevel.StorageProvider;
+        vm.MainVindowTopLevel = topLevel;
         if (await AppSettings.Load() is AppSettings s)
         { 
             vm.Settings = s; 

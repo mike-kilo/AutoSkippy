@@ -1,4 +1,6 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
+using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -44,7 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public AppSettings Settings { get; set; } = new();
 
-    public IStorageProvider? StorageProvider { get; set; }
+    public TopLevel? MainVindowTopLevel { get; set;  }
 
     public MainWindowViewModel()
     {
@@ -116,10 +118,10 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task AbortPayload() => Processor.IsBreakRequested = true;
 
     public async Task<IStorageFolder?> GetPayloadFolder() =>
-        StorageProvider is null ? null :
-        !string.IsNullOrEmpty(RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
-        !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await StorageProvider.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
-        await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+        MainVindowTopLevel?.StorageProvider is not IStorageProvider sp ? null :
+        !string.IsNullOrEmpty(RecentFolder) && await sp.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
+        !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await sp.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
+        await sp.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 
     [RelayCommand]
     public async Task RunOncePayloadSection(object? parameter)
