@@ -21,10 +21,10 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
     public event EventHandler<string>? RecentCommand;
 
     [ObservableProperty]
-    private bool _isProcessing = false;
+    public partial bool IsProcessing { get; set; } = false;
 
     [ObservableProperty]
-    private bool _isBreakRequested = false;
+    public partial bool IsBreakRequested { get; set; } = false;
 
     public ComPortComm Communicator { get; private set; } = communicator;
 

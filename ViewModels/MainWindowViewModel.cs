@@ -14,19 +14,19 @@ public partial class MainWindowViewModel : ViewModelBase
     public static string VersionNumber => Assembly.GetExecutingAssembly()?.GetName().Version?.ToString() ?? "Unknown";
 
     [ObservableProperty]
-    private ScpiPayload _currentPayload = new();
+    public partial ScpiPayload CurrentPayload { get; set; } = new();
 
     [ObservableProperty]
-    private string _currentPayloadPath = string.Empty;
+    public partial string CurrentPayloadPath { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _resultsLines = string.Empty;
+    public partial string ResultsLines { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _recentFolder = string.Empty;
+    public partial string RecentFolder { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private ComPortComm _communicator = new();
+    public partial ComPortComm Communicator { get; set; } = new();
 
     public ObservableCollection<string> AvailableComPorts { get; private set; } = [];
 
@@ -34,13 +34,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectComCommand))]
-    private string? _selectedComPort = string.Empty;
+    public partial string? SelectedComPort { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private int _progressSteps = 0;
+    public partial int ProgressSteps { get; set; } = 0;
 
     [ObservableProperty]
-    private string _recentCommand = string.Empty;
+    public partial string RecentCommand { get; set; } = string.Empty;
 
     public AppSettings Settings { get; set; } = new();
 
