@@ -169,11 +169,17 @@
 					</TextBox.ContextMenu>
 				</TextBox>
 			</Grid>
-			<Grid Grid.Row="8" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
-				<Button Grid.Column="1" Content="Copy all" 
+			<Grid Grid.Row="8" Grid.Column="1" RowDefinitions="Auto,3,Auto" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
+				<Button Grid.Column="1" Content="Dots to commas"
+						Command="{Binding DotsToCommasCommand}"
+						Width="150" HorizontalContentAlignment="Center" />
+				<Button Grid.Column="3" Content="Commas to dots"
+						Command="{Binding CommasToDotsCommand}"
+						Width="150" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="1" Content="Copy all" 
 						Command="{Binding CopyTextCommand}" CommandParameter="{Binding ResultsLines}" 
-						Width="100" HorizontalContentAlignment="Center" />
-				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
+						Width="100" HorizontalAlignment="Right" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
 			</Grid> 
 		</Grid>
 		<Border Grid.Row="3" 

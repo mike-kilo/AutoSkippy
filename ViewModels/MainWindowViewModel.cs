@@ -140,4 +140,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
         await clipboard.SetTextAsync(text);
     }
+
+    [RelayCommand]
+    public void DotsToCommas() => ResultsLines = ResultsLines.Replace('.', ',');
+
+    [RelayCommand]
+    public void CommasToDots() => ResultsLines = ResultsLines.Replace(',', '.');
+
 }
