@@ -85,22 +85,24 @@
 						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 						VerticalAlignment="Stretch" Margin="3"
 						ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
-			<Grid Grid.Row="8" ColumnDefinitions="Auto,3,Auto,6,*" 
+			<Grid Grid.Row="8" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,3,Auto,6,*" 
 				  IsEnabled="{Binding Communicator.IsConnected}"
 				  Margin="3" >
 				<Button Content="Run" Command="{Binding RunPayloadCommand}" 
 						IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
-						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+						Width="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
 				<Button Content="Abort" Command="{Binding AbortPayloadCommand}" 
                         Grid.Column="2"
 						IsEnabled="{Binding Processor.IsProcessing}"
-						Width="59" HorizontalContentAlignment="Center" />
+					Width="60" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
 				<ProgressBar Grid.Column="4" VerticalAlignment="Stretch" 
 							 ShowProgressText="True" 
 							 Value="{Binding ProgressSteps}"
 							 Minimum="0" Maximum="{Binding CurrentPayload.StepsCount, FallbackValue=0}" />
+				<TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="Recent command" HorizontalAlignment="Right" VerticalAlignment="Center" />
+				<TextBox Grid.Row="2" Grid.Column="4" IsReadOnly="True" Text="{Binding RecentCommand}" />
 			</Grid>
-			<StackPanel Grid.Row="9" Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" >
+			<StackPanel Grid.Row="9" Spacing="3" HorizontalAlignment="Center" Orientation="Horizontal" Margin="3" >
 				<Button Grid.Row="2"
 						Content="Save"
 						Command="{Binding SavePayloadCommand}"

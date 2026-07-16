@@ -18,6 +18,8 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
 
     public event EventHandler? Progressed;
 
+    public event EventHandler<string>? RecentCommand;
+
     [ObservableProperty]
     private bool _isProcessing = false;
 
@@ -29,6 +31,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
     private async Task<string?> ProcessScpiLine(string line)
     {
         if (!Communicator.IsConnected) return null;
+        RecentCommand?.Invoke(this, line);
         await Task.Run(() => Communicator.Send(line));
         var received = string.Empty;
         if (line.EndsWith('?'))

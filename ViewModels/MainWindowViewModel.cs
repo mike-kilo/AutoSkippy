@@ -39,6 +39,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private int _progressSteps = 0;
 
+    [ObservableProperty]
+    private string _recentCommand = string.Empty;
+
     public AppSettings Settings { get; set; } = new();
 
     public IStorageProvider? StorageProvider { get; set; }
@@ -48,7 +51,10 @@ public partial class MainWindowViewModel : ViewModelBase
         Processor = new(Communicator);
         Processor.Progressed += ProcessorProgressed;
         Processor.LineReceived += ProcessorLineReceived;
+        Processor.RecentCommand += ProcessorRecentCommand;
     }
+
+    private void ProcessorRecentCommand(object? sender, string e) => RecentCommand = e;
 
     private void ProcessorProgressed(object? sender, EventArgs e) => ProgressSteps++;
 
