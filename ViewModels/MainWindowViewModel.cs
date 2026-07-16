@@ -54,7 +54,11 @@ public partial class MainWindowViewModel : ViewModelBase
         Processor.Progressed += ProcessorProgressed;
         Processor.LineReceived += ProcessorLineReceived;
         Processor.RecentCommand += ProcessorRecentCommand;
+
+        ScpiPayload.PayloadChanged += CurrentPayloadChanged;
     }
+
+    private void CurrentPayloadChanged(object? sender, EventArgs e) => ProgressSteps = 0;
 
     private void ProcessorRecentCommand(object? sender, string e) => RecentCommand = e;
 
@@ -147,4 +151,5 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void CommasToDots() => ResultsLines = ResultsLines.Replace(',', '.');
 
+    partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
 }

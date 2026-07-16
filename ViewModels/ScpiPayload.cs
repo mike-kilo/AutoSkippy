@@ -17,6 +17,8 @@ public partial class ScpiPayload : ViewModelBase
     public static readonly string DefaultPreFetchValueCommands = "CONF:TCH,CONF:TDW,CONF:TME,CONF:TDIS,4";
     public static readonly string DefaultPreFetchAppliedCommands = "FETC";
 
+    public static event EventHandler? PayloadChanged;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepsCount))]
     [NotifyPropertyChangedFor(nameof(PreFetchDelay))]
@@ -67,6 +69,14 @@ public partial class ScpiPayload : ViewModelBase
 
         return fixedValue + delayValue;
     }
+
+    partial void OnSetupLinesChanged(string value) => PayloadChanged?.Invoke(this, new EventArgs()); 
+
+    partial void OnLoopLinesChanged(string value) => PayloadChanged?.Invoke(this, new());
+
+    partial void OnLoopCountChanged(int value) => PayloadChanged?.Invoke(this, new());
+
+    partial void OnTeardownLinesChanged(string value) => PayloadChanged?.Invoke(this, new());
 }
 
 [DataContract]
