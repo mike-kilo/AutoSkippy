@@ -77,6 +77,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
                     for (int w = 0; w < payload.PreFetchDelay; w++)
                     {
                         if (IsBreakRequested) break;
+                        RecentCommand?.Invoke(this, $"Pre-fetch delay, {payload.PreFetchDelay - w} seconds left.");
                         await Task.Delay(1000);
                     }
                 }
