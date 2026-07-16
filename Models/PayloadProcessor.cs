@@ -96,6 +96,23 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
         IsBreakRequested = false;
     }
 
+    public async Task Process(string[] lines)
+    {
+        if (!Communicator.IsConnected) return;
+        if (lines is null) return;
+
+        IsProcessing = true;
+
+        foreach (var line in lines)
+        {
+            if (IsBreakRequested) break;
+            await ProcessScpiLine(line);
+        }
+
+        IsProcessing = false;
+        IsBreakRequested = false;
+    }
+
     partial void OnIsBreakRequestedChanged(bool value)
     {
         if (value && Communicator.IsConnected) Communicator.Cancel();

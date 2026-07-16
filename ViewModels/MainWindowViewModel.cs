@@ -120,4 +120,13 @@ public partial class MainWindowViewModel : ViewModelBase
         !string.IsNullOrEmpty(RecentFolder) && await StorageProvider.TryGetFolderFromPathAsync(RecentFolder) is IStorageFolder sf ? sf :
         !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await StorageProvider.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
         await StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+    [RelayCommand]
+    public async Task RunOncePayloadSection(object? parameter)
+    {
+        if (parameter is string linesRaw && linesRaw.Split(Environment.NewLine) is string[] lines && lines.Length > 0)
+        {
+            await Processor.Process(lines);
+        }
+    }
 }
