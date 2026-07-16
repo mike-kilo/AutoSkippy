@@ -88,13 +88,4 @@ public partial class MainWindow : Window
             vm.SelectedComPort = vm.Settings.RecentUsedPort;
         }
     }
-
-    private async void ButtonCopyClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
-        if (this.DataContext is not MainWindowViewModel vm) return;
-        if (topLevel.Clipboard is not IClipboard clipboard) return;
-
-        await clipboard.SetTextAsync(vm.ResultsLines);
-    }
 }

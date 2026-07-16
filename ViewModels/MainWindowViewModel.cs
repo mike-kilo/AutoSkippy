@@ -133,7 +133,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task CopySelectedText(object? parameter)
+    public async Task CopyText(object? parameter)
     {
         if (parameter is not string text) return;
         if (MainVindowTopLevel?.Clipboard is not IClipboard clipboard) return;
