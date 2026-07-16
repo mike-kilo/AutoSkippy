@@ -159,10 +159,18 @@
 						 IsReadOnly="True"
 						 AcceptsReturn="True" TextWrapping="Wrap"
 						 VerticalAlignment="Stretch"
-						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+						 ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Visible" >
+					<TextBox.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="Copy selected" 
+									  Command="{Binding CopySelectedTextCommand}" CommandParameter="{Binding $parent[TextBox].SelectedText}" 
+									  IsEnabled="{Binding $parent[TextBox].SelectedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+						</ContextMenu>
+					</TextBox.ContextMenu>
+				</TextBox>
 			</Grid>
 			<Grid Grid.Row="8" Grid.Column="1" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
-				<Button Grid.Column="1" Content="Copy" 
+				<Button Grid.Column="1" Content="Copy all" 
 						Click="ButtonCopyClick"
 						Width="100" HorizontalContentAlignment="Center" />
 				<Button Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />

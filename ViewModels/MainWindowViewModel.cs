@@ -1,4 +1,4 @@
-using AutoSkippy.Models;
+﻿using AutoSkippy.Models;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
@@ -130,5 +130,14 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             await Processor.Process(lines);
         }
+    }
+
+    [RelayCommand]
+    public async Task CopySelectedText(object? parameter)
+    {
+        if (parameter is not string text) return;
+        if (MainVindowTopLevel?.Clipboard is not IClipboard clipboard) return;
+
+        await clipboard.SetTextAsync(text);
     }
 }
