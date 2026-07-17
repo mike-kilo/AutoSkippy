@@ -33,3 +33,12 @@ A GUI program (C#/AvaloniaUI) was perpared that allows:
 
 ## Instructions for use
 User manual (Instructions for use) can be found in the [Manual](MANUAL.md) file.
+
+## License, releases, and stuff
+The software was made for this specific case study, though it is possible to exted it in the future (until it reads email, Zawinski's Law), depending on requests.  
+
+It is provided as is (MIT license), without any warranty, and me, the author, can not be made liable for the usage of any kind.  
+
+Source code is available on GitHub, enjoy.  
+
+Official releases (executables) are not planned as for now (14 July 2026). Contact me if you need an executable. Same if you would like to request specific features.
