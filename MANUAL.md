@@ -1,8 +1,8 @@
-## Instructions for use
+## AutoSkippy - Instructions for use
 ### Starting the software
 Start the software by double clicking on the AutoSkippy icon or select AutoSkippy from the start menu.  
 You should see the following window appear:
-<img width="1032" height="685" alt="image" src="https://github.com/user-attachments/assets/14b9fe87-6ebb-4714-85ae-f73d6d98e213" />
+<img width="1085" height="752" alt="image" src="https://github.com/user-attachments/assets/8d95005f-8c61-4880-b0e6-36902c87f19b" />
 
 ### Connecting with your measurement equipment
 Select the COM port, on which your device is connected. If the port is not listed in the drop-down box, make sure it's connected, powered on, has the communication enabled, refresh the ports (circled arrow button next to the drop-down box) and try again.  
@@ -37,16 +37,26 @@ If a loaded payload was modified, it can be saved (overweritten) by pressing "Sa
 ### Running the payload
 Press "Run" button to start sending the commands to the device. You should see the progress bar advancing. At any moment it is possible to abort the execution by pressing "Abort" button. Once aborted, it is not possible to resume, only to start again from the beginning.
 
+### Monitoring the progress
+Progress of the current payload can be monitored by observing the progress bar - each command advances the progress bar the same step.  
+Furthermore, the recent command sent is displayed in the *Recent command* field. Also the pre-fetch delay duration is displayed only in the *Recent command* field.
+
 ### Transferring the results
 Once the results appear in the _Results_ section, it is possible to copy the entire content to the clipboard by pressing "Copy" button.  
-It is also possible to select (using mouse cursor) only a portion of the results and copy it to clipboads by pressing Ctrl+C keys.
+It is also possible to select (using mouse cursor) only a portion of the results and copy it to clipboads by pressing Ctrl+C keys or pressing right mouse button and pressing on *Copy selected* in the context menu.
 
 Paste the copied content to the location of your choice.
+
+It may happen that the decimal separator returned by the device does not match the one of your system.  
+Since it is not possible to reconfigure the device, the software allows to replace all the dots in the *Results* field to commas and the other way round. Check if it's necessary by comparing the decimal separator in the results with your system's detected setting, which is displayed next to the *Dots to commas* and *Commas to dots* buttons.
 
 ### Running another measurement session
 You can run another measurement session by simply running the payload again, or load another payload and run it.
 
 The received results will be appended to the current results unless the _Results_ section is not cleared by pressing "Clear" button.
+
+### Running single steps
+It is possible to run a single step, e.g. setup, loop, or teardown, by clicking the right mouse button and selecting *Run once* from the context menu.
 
 ### Exiting the software
 You can close the software by pressing the X sign in the corner of the window. Any unsaved changes in your payload will be lost.  
@@ -54,12 +64,3 @@ It's a good practice to disconnect the connected device.
 
 The software retains the recently used COM port number and selects it upon the next start, if this port is available.  
 The software retains the recently used payload load/save location and uses it on the next start.
-
-## License, releases, and stuff
-The software was made for this specific case study, though it is possible to exted it in the future (until it reads email, Zawinski's Law), depending on requests.  
-
-It is provided as is (MIT license), without any warranty, and me, the author, can not be made liable for the usage of any kind.  
-
-Source code is available on GitHub, enjoy.  
-
-Official releases (executables) are not planned as for now (14 July 2026). Contact me if you need an executable. Same if you would like to request specific features.
