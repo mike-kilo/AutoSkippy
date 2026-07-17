@@ -10,6 +10,7 @@
         Icon="/Assets/AutoSkippyIcon.ico"
 		WindowStartupLocation="CenterScreen"
 		MinWidth="1000" MinHeight="600"
+		Width="{Binding $self.MinWidth}" Height="{Binding $self.MinHeight}"
 		Loaded="WindowLoaded"
         Title="AutoSkippy">
 
@@ -182,7 +183,7 @@
 				</StackPanel>
 				<Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="Copy all" 
 						Command="{Binding CopyTextCommand}" CommandParameter="{Binding ResultsLines}" 
-						Width="200" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
+						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
 				<Button Grid.Row="2" Grid.Column="5" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalAlignment="Right" HorizontalContentAlignment="Center" />
 			</Grid> 
 		</Grid>
