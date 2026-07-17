@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -47,6 +48,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public AppSettings Settings { get; set; } = new();
 
     public TopLevel? MainVindowTopLevel { get; set;  }
+
+    public static string SystemDecimalSeparator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
     public MainWindowViewModel()
     {
@@ -95,6 +98,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool IsComPortSelected() => !string.IsNullOrEmpty(SelectedComPort);
 
+    public bool IsDeviceConnected() => Communicator.IsConnected;
+
     [RelayCommand(CanExecute = nameof(IsComPortSelected))]
     public async Task ConnectCom()
     {
@@ -127,7 +132,7 @@ public partial class MainWindowViewModel : ViewModelBase
         !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await sp.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
         await sp.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsDeviceConnected))]
     public async Task RunOncePayloadSection(object? parameter)
     {
         if (parameter is string linesRaw && linesRaw.Split(Environment.NewLine) is string[] lines && lines.Length > 0)
