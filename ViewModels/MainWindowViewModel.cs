@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -47,6 +48,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public AppSettings Settings { get; set; } = new();
 
     public TopLevel? MainVindowTopLevel { get; set;  }
+
+    public static string SystemDecimalSeparator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
     public MainWindowViewModel()
     {

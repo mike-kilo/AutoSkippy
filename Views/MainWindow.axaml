@@ -3,13 +3,13 @@
         xmlns:vm="using:AutoSkippy.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
         x:Class="AutoSkippy.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
 		xmlns:fi="using:FluentIcons.Avalonia"
         Icon="/Assets/AutoSkippyIcon.ico"
 		WindowStartupLocation="CenterScreen"
-		MinWidth="800" MinHeight="600"
+		MinWidth="1000" MinHeight="600"
 		Loaded="WindowLoaded"
         Title="AutoSkippy">
 
@@ -169,17 +169,21 @@
 					</TextBox.ContextMenu>
 				</TextBox>
 			</Grid>
-			<Grid Grid.Row="8" Grid.Column="1" RowDefinitions="Auto,3,Auto" ColumnDefinitions="*,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
-				<Button Grid.Column="1" Content="Dots to commas"
+			<Grid Grid.Row="8" Grid.Column="1" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
+				<Button Grid.Column="0" Content="Dots to commas"
 						Command="{Binding DotsToCommasCommand}"
 						Width="150" HorizontalContentAlignment="Center" />
-				<Button Grid.Column="3" Content="Commas to dots"
+				<Button Grid.Column="2" Content="Commas to dots"
 						Command="{Binding CommasToDotsCommand}"
 						Width="150" HorizontalContentAlignment="Center" />
-				<Button Grid.Row="2" Grid.Column="1" Content="Copy all" 
+				<StackPanel Grid.Column="4" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+					<TextBlock Text="System dec. sep.: " VerticalAlignment="Center" />
+					<TextBlock Text="{Binding SystemDecimalSeparator}" FontWeight="Bold" FontSize="46" Margin="0,-40,0,-60" VerticalAlignment="Center" />
+				</StackPanel>
+				<Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="Copy all" 
 						Command="{Binding CopyTextCommand}" CommandParameter="{Binding ResultsLines}" 
-						Width="100" HorizontalAlignment="Right" HorizontalContentAlignment="Center" />
-				<Button Grid.Row="2" Grid.Column="3" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalContentAlignment="Center" />
+						Width="200" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
+				<Button Grid.Row="2" Grid.Column="5" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalAlignment="Right" HorizontalContentAlignment="Center" />
 			</Grid> 
 		</Grid>
 		<Border Grid.Row="3" 
