@@ -98,6 +98,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool IsComPortSelected() => !string.IsNullOrEmpty(SelectedComPort);
 
+    public bool IsDeviceConnected() => Communicator.IsConnected;
+
     [RelayCommand(CanExecute = nameof(IsComPortSelected))]
     public async Task ConnectCom()
     {
@@ -130,7 +132,7 @@ public partial class MainWindowViewModel : ViewModelBase
         !string.IsNullOrEmpty(Settings.RecentUsedFolder) && await sp.TryGetFolderFromPathAsync(Settings.RecentUsedFolder) is IStorageFolder sf0 ? sf0 :
         await sp.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsDeviceConnected))]
     public async Task RunOncePayloadSection(object? parameter)
     {
         if (parameter is string linesRaw && linesRaw.Split(Environment.NewLine) is string[] lines && lines.Length > 0)
