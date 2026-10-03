@@ -24,25 +24,36 @@
 			   HorizontalAlignment="Center"
 			   FontWeight="DemiBold"/>
 		<Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,2*,Auto,2*,Auto,*,Auto,Auto" ColumnDefinitions="*,*" Margin="3">
-			<StackPanel Orientation="Horizontal" Margin="3" >
+			<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto" Margin="3" >
 				<TextBlock Text="Select COM port:" VerticalAlignment="Center" Margin="3"/>
-				<ComboBox Width="100" Margin="3"
+				<ComboBox Grid.Column="1"
+						  Width="100" Margin="3"
 						  ItemsSource="{Binding AvailableComPorts}"
 						  SelectedItem="{Binding SelectedComPort, Mode=TwoWay}" 
 						  VerticalAlignment="Center"/>
-				<Button Command="{Binding RefreshComPortsCommand}" Margin="3" 
+				<Button Grid.Column="2"
+						Command="{Binding RefreshComPortsCommand}" Margin="3" 
 						ToolTip.Tip="Refresh">
 					<Button.Content>
 						<fi:SymbolIcon Symbol="ArrowClockwise" IconVariant="Regular" />
 					</Button.Content>
 				</Button>
-				<Button Content="Connect" Command="{Binding ConnectComCommand}" 
+				<Button Grid.Column="3"
+						Content="Connect" Command="{Binding ConnectComCommand}" 
 						IsVisible="{Binding Communicator.IsConnected, Converter={x:Static BoolConverters.Not}, FallbackValue=True}"
 						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
-				<Button Content="Disconnect" Command="{Binding DisconnectComCommand}" 
+				<Button Grid.Column="3"
+						Content="Disconnect" Command="{Binding DisconnectComCommand}" 
 						IsVisible="{Binding Communicator.IsConnected, FallbackValue=False}"
 						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
-			</StackPanel>
+				<TextBlock Text="Connected device:" Grid.Row="1" VerticalAlignment="Center" Margin="3"/>
+				<TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3"
+						 Text="{Binding ConnectedDevice}"
+						 IsReadOnly="True"
+						 IsEnabled="{Binding Communicator.IsConnected, FallbackValue=False}"
+						 ToolTip.Tip="{Binding ConnectedDeviceFull}"
+						 HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="3" />
+			</Grid>
 			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" 
 				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 				  Margin="3">

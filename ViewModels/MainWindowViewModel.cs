@@ -47,6 +47,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public AppSettings Settings { get; set; } = new();
 
+    [ObservableProperty]
+    public partial string ConnectedDevice { get; set;  } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ConnectedDeviceFull { get; set; } = string.Empty;
+
     public TopLevel? MainVindowTopLevel { get; set;  }
 
     public static string SystemDecimalSeparator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
