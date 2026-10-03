@@ -24,37 +24,39 @@
 			   HorizontalAlignment="Center"
 			   FontWeight="DemiBold"/>
 		<Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,2*,Auto,2*,Auto,*,Auto,Auto" ColumnDefinitions="*,*" Margin="3">
-			<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto" Margin="3" >
-				<TextBlock Text="Select COM port:" VerticalAlignment="Center" Margin="3"/>
-				<ComboBox Grid.Column="1"
-						  Width="100" Margin="3"
-						  ItemsSource="{Binding AvailableComPorts}"
-						  SelectedItem="{Binding SelectedComPort, Mode=TwoWay}" 
-						  VerticalAlignment="Center"/>
-				<Button Grid.Column="2"
-						Command="{Binding RefreshComPortsCommand}" Margin="3" 
-						ToolTip.Tip="Refresh">
-					<Button.Content>
-						<fi:SymbolIcon Symbol="ArrowClockwise" IconVariant="Regular" />
-					</Button.Content>
-				</Button>
-				<Button Grid.Column="3"
-						Content="Connect" Command="{Binding ConnectComCommand}" 
-						IsVisible="{Binding Communicator.IsConnected, Converter={x:Static BoolConverters.Not}, FallbackValue=True}"
-						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
-				<Button Grid.Column="3"
-						Content="Disconnect" Command="{Binding DisconnectComCommand}" 
-						IsVisible="{Binding Communicator.IsConnected, FallbackValue=False}"
-						Margin="3,0" Width="100" HorizontalContentAlignment="Center" />
-				<TextBlock Text="Connected device:" Grid.Row="1" VerticalAlignment="Center" Margin="3"/>
-				<TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3"
-						 Text="{Binding ConnectedDevice}"
-						 IsReadOnly="True"
-						 IsEnabled="{Binding Communicator.IsConnected, FallbackValue=False}"
-						 ToolTip.Tip="{Binding ConnectedDeviceFull}"
-						 ToolTip.ServiceEnabled="{Binding ConnectedDeviceFull, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-						 HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="3" />
-			</Grid>
+			<HeaderedContentControl Header="Device" Margin="3">
+				<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,140" Margin="3" >
+					<TextBlock Text="Select COM port:" VerticalAlignment="Center" Margin="3"/>
+					<ComboBox Grid.Column="1"
+							  HorizontalAlignment="Stretch" Margin="3"
+							  ItemsSource="{Binding AvailableComPorts}"
+							  SelectedItem="{Binding SelectedComPort, Mode=TwoWay}" 
+							  VerticalAlignment="Center"/>
+					<Button Grid.Column="2"
+							Command="{Binding RefreshComPortsCommand}" Margin="3" 
+							ToolTip.Tip="Refresh">
+						<Button.Content>
+							<fi:SymbolIcon Symbol="ArrowClockwise" IconVariant="Regular" />
+						</Button.Content>
+					</Button>
+					<Button Grid.Column="3"
+							Content="Connect" Command="{Binding ConnectComCommand}" 
+							IsVisible="{Binding Communicator.IsConnected, Converter={x:Static BoolConverters.Not}, FallbackValue=True}"
+							Margin="3,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+					<Button Grid.Column="3"
+							Content="Disconnect" Command="{Binding DisconnectComCommand}" 
+							IsVisible="{Binding Communicator.IsConnected, FallbackValue=False}"
+							Margin="3,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+					<TextBlock Text="Connected device:" Grid.Row="1" VerticalAlignment="Center" Margin="3"/>
+					<TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3"
+							 Text="{Binding ConnectedDevice}"
+							 IsReadOnly="True"
+							 IsEnabled="{Binding Communicator.IsConnected, FallbackValue=False}"
+							 ToolTip.Tip="{Binding ConnectedDeviceFull}"
+							 ToolTip.ServiceEnabled="{Binding ConnectedDeviceFull, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+							 HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="3" />
+				</Grid>
+			</HeaderedContentControl>
 			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" 
 				  IsEnabled="{Binding Processor.IsProcessing, Converter={x:Static BoolConverters.Not}}"
 				  Margin="3">
@@ -144,9 +146,9 @@
 						Click="ButtonSaveAsClick"
 						Width="120" HorizontalContentAlignment="Center" />
 			</StackPanel>
-			<Grid Grid.Column="1" Grid.RowSpan="2" Margin="3">
-				<HeaderedContentControl Header="Pre-fetch delay settings">
-					<Grid RowDefinitions="Auto,3,Auto,3,Auto" ColumnDefinitions="Auto,*" Margin="3">
+			<Grid Grid.Column="1" Grid.RowSpan="1" Margin="3">
+				<HeaderedContentControl Header="Pre-fetch delay settings" >
+					<Grid RowDefinitions="Auto,3,Auto,3,Auto" ColumnDefinitions="Auto,3,*" Margin="3">
 						<TextBlock Text="Value commands" VerticalAlignment="Center" >
 							<ToolTip.Tip>
 								<StackPanel>
@@ -158,10 +160,10 @@
 							</ToolTip.Tip>
 						</TextBlock>
 						<TextBlock Text="Delayed commands" Grid.Row="2" ToolTip.Tip="Commands, before which the delay is applied." VerticalAlignment="Center" />
-						<TextBlock Text="Calculated delay [s]" Grid.Row="4" VerticalAlignment="Center" />
-						<TextBox Grid.Column="1" Text="{Binding CurrentPayload.PreFetchValueCommands, Mode=TwoWay}" />
-						<TextBox Grid.Row="2" Text="{Binding CurrentPayload.PreFetchAppliedCommands, Mode=TwoWay}" Grid.Column="1" />
-						<TextBlock Grid.Row="4" Text="{Binding CurrentPayload.PreFetchDelay}" Grid.Column="1" Margin="3" />
+						<TextBlock Text="Calculated delay:" FontWeight="DemiBold" Grid.Row="4" VerticalAlignment="Center" />
+						<TextBox Grid.Column="2" Text="{Binding CurrentPayload.PreFetchValueCommands, Mode=TwoWay}" />
+						<TextBox Grid.Row="2" Grid.Column="2" Text="{Binding CurrentPayload.PreFetchAppliedCommands, Mode=TwoWay}" />
+						<TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding CurrentPayload.PreFetchDelay, StringFormat={}{0} seconds}" FontWeight="DemiBold" Margin="3" />
 					</Grid>
 				</HeaderedContentControl>
 			</Grid>
