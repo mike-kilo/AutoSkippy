@@ -28,7 +28,7 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
 
     public ComPortComm Communicator { get; private set; } = communicator;
 
-    private async Task<string?> ProcessScpiLine(string line)
+    public async Task<string?> ProcessScpiLine(string line, bool emitEvents = true)
     {
         if (!Communicator.IsConnected) return null;
         RecentCommand?.Invoke(this, line);
@@ -44,10 +44,13 @@ public partial class PayloadProcessor(ComPortComm communicator) : ObservableObje
             await Task.Delay(ComPortComm.TIMEOUT);
         }
 
-        Progressed?.Invoke(this, new EventArgs());
-        if (!string.IsNullOrEmpty(received))
-        { 
-            LineReceived?.Invoke(this, new LineReceivedEventArgs() { Text = received, Timestamp = DateTime.Now }); 
+        if (emitEvents)
+        {
+            Progressed?.Invoke(this, new EventArgs());
+            if (!string.IsNullOrEmpty(received))
+            {
+                LineReceived?.Invoke(this, new LineReceivedEventArgs() { Text = received, Timestamp = DateTime.Now });
+            }
         }
         
         return string.IsNullOrEmpty(received) ? null : received.Trim();

@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -46,6 +47,12 @@ public partial class MainWindowViewModel : ViewModelBase
     public partial string RecentCommand { get; set; } = string.Empty;
 
     public AppSettings Settings { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string ConnectedDevice { get; set;  } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ConnectedDeviceFull { get; set; } = string.Empty;
 
     public TopLevel? MainVindowTopLevel { get; set;  }
 
@@ -109,10 +116,28 @@ public partial class MainWindowViewModel : ViewModelBase
             Settings.RecentUsedPort = SelectedComPort;
             await Settings.Save();
         }
+
+        if(Communicator.IsConnected && 
+           await Processor.ProcessScpiLine("IDN?", false) is string idn && 
+           idn.Length > 0)
+        {
+            ConnectedDeviceFull = idn;
+            ConnectedDevice = idn.Split(Environment.NewLine).Last();
+        }
+        else
+        {
+            ConnectedDeviceFull = string.Empty;
+            ConnectedDevice = string.Empty;
+        }
     }
 
     [RelayCommand]
-    public void DisconnectCom() => Communicator.CloseConnection();
+    public void DisconnectCom() 
+    { 
+        Communicator.CloseConnection();
+        ConnectedDeviceFull = string.Empty;
+        ConnectedDevice = string.Empty;
+    }
 
     [RelayCommand]
     public async Task RunPayload()
