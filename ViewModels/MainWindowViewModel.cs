@@ -54,6 +54,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string ConnectedDeviceFull { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    public partial bool IsLiveDecimalSymbolChange { get; set; } = false;
+
     public TopLevel? MainVindowTopLevel { get; set;  }
 
     public static string SystemDecimalSeparator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
