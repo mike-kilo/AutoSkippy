@@ -52,6 +52,7 @@
 						 IsReadOnly="True"
 						 IsEnabled="{Binding Communicator.IsConnected, FallbackValue=False}"
 						 ToolTip.Tip="{Binding ConnectedDeviceFull}"
+						 ToolTip.ServiceEnabled="{Binding ConnectedDeviceFull, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
 						 HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="3" />
 			</Grid>
 			<Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" 
