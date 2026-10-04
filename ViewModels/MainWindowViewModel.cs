@@ -190,23 +190,9 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public void ConvertDecimalSymbol()
-    {
-        if (DecimalSymbolConverters[SelectedDecimalSymbolIndex].ConversionMethod is Func<string, string> f)
-            ResultsLines = f(ResultsLines);
-    }
+    public void ConvertDecimalSymbol() => ResultsLines = DecimalSymbolConverters[SelectedDecimalSymbolIndex].ConversionMethod(ResultsLines);
 
     partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
 
     partial void OnSelectedDecimalSymbolIndexChanged(int value) => Settings.RecentDecimalSymbolConverterIndex = value;
-}
-
-public static class ConversionExtensions
-{
-    extension(string text)
-    {
-        public string DotsToCommas() => text.Replace('.', ',');
-
-        public string CommasToDots() => text.Replace(',', '.');
-    }
 }
