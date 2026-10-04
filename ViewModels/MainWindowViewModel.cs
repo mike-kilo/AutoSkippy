@@ -1,4 +1,4 @@
-using AutoSkippy.Models;
+﻿using AutoSkippy.Models;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
@@ -46,7 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string RecentCommand { get; set; } = string.Empty;
 
-    public AppSettings Settings { get; set; } = new();
+    public AppSettings Settings { get; set; }
 
     [ObservableProperty]
     public partial string ConnectedDevice { get; set;  } = string.Empty;
@@ -72,6 +72,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        Settings = AppSettings.Load()?.Result ?? new();
+
         Processor = new(Communicator);
         Processor.Progressed += ProcessorProgressed;
         Processor.LineReceived += ProcessorLineReceived;

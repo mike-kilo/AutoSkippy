@@ -77,10 +77,6 @@ public partial class MainWindow : Window
         if (TopLevel.GetTopLevel(this) is not TopLevel topLevel) return;
 
         vm.MainVindowTopLevel = topLevel;
-        if (await AppSettings.Load() is AppSettings s)
-        { 
-            vm.Settings = s; 
-        }
 
         vm.RefreshComPorts();
         if (vm.AvailableComPorts.Contains(vm.Settings.RecentUsedPort))
