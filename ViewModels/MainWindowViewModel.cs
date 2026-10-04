@@ -1,4 +1,4 @@
-﻿using AutoSkippy.Models;
+using AutoSkippy.Models;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
@@ -80,6 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ScpiPayload.PayloadChanged += CurrentPayloadChanged;
 
         SelectedDecimalSymbolIndex = Settings.RecentDecimalSymbolConverterIndex;
+        IsLiveDecimalSymbolChange = Settings.RecentDecimalSymbolConverterLive;
     }
 
     private void CurrentPayloadChanged(object? sender, EventArgs e) => ProgressSteps = 0;
@@ -200,4 +201,11 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
 
     partial void OnSelectedDecimalSymbolIndexChanged(int value) => Settings.RecentDecimalSymbolConverterIndex = value;
+
+    async partial void OnIsLiveDecimalSymbolChangeChanged(bool value)
+    {
+        Settings.RecentDecimalSymbolConverterLive = value;
+        Settings.RecentDecimalSymbolConverterIndex = SelectedDecimalSymbolIndex;
+        await Settings.Save();
+    }
 }
