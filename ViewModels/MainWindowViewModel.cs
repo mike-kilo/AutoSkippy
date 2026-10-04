@@ -88,7 +88,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void ProcessorProgressed(object? sender, EventArgs e) => ProgressSteps++;
 
-    private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => ResultsLines += e.Text.Trim() + Environment.NewLine;
+    private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => 
+        ResultsLines += 
+        (IsLiveDecimalSymbolChange 
+         ? DecimalSymbolConverters[SelectedDecimalSymbolIndex].ConversionMethod(e.Text.Trim()) 
+         : e.Text.Trim()) 
+        + Environment.NewLine;
 
     public static async Task SavePayloadToJson(ScpiPayload payload, string fullFileName) => await payload.ToSerialisable().Save(fullFileName);
 
