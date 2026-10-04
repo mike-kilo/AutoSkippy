@@ -57,6 +57,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial bool IsLiveDecimalSymbolChange { get; set; } = false;
 
+    public DecimalSymbolConverter[] DecimalSymbolConverters { get; set; } =
+    [
+        new() { Description = "Dots to commas", ConversionMethod = ConversionExtensions.DotsToCommas, SourceCharacter = '.' },
+        new() { Description = "Commas to dots", ConversionMethod = ConversionExtensions.CommasToDots, SourceCharacter = ',' },
+    ];
+
+    [ObservableProperty]
+    public partial int SelectedDecimalSymbolIndex { get; set; } = 0;
+
     public TopLevel? MainVindowTopLevel { get; set;  }
 
     public static string SystemDecimalSeparator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
@@ -179,10 +188,21 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public void DotsToCommas() => ResultsLines = ResultsLines.Replace('.', ',');
-
-    [RelayCommand]
-    public void CommasToDots() => ResultsLines = ResultsLines.Replace(',', '.');
+    public void ConvertDecimalSymbol()
+    {
+        if (DecimalSymbolConverters[SelectedDecimalSymbolIndex].ConversionMethod is Func<string, string> f)
+            ResultsLines = f(ResultsLines);
+    }
 
     partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
+}
+
+public static class ConversionExtensions
+{
+    extension(string text)
+    {
+        public string DotsToCommas() => text.Replace('.', ',');
+
+        public string CommasToDots() => text.Replace(',', '.');
+    }
 }
