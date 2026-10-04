@@ -64,7 +64,7 @@ public partial class MainWindowViewModel : ViewModelBase
     ];
 
     [ObservableProperty]
-    public partial int SelectedDecimalSymbolIndex { get; set; } = 0;
+    public partial int SelectedDecimalSymbolIndex { get; set; }
 
     public TopLevel? MainVindowTopLevel { get; set;  }
 
@@ -78,6 +78,8 @@ public partial class MainWindowViewModel : ViewModelBase
         Processor.RecentCommand += ProcessorRecentCommand;
 
         ScpiPayload.PayloadChanged += CurrentPayloadChanged;
+
+        SelectedDecimalSymbolIndex = Settings.RecentDecimalSymbolConverterIndex;
     }
 
     private void CurrentPayloadChanged(object? sender, EventArgs e) => ProgressSteps = 0;
@@ -195,6 +197,8 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
+
+    partial void OnSelectedDecimalSymbolIndexChanged(int value) => Settings.RecentDecimalSymbolConverterIndex = value;
 }
 
 public static class ConversionExtensions
