@@ -46,7 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string RecentCommand { get; set; } = string.Empty;
 
-    public AppSettings Settings { get; set; } = new();
+    public AppSettings Settings { get; set; }
 
     [ObservableProperty]
     public partial string ConnectedDevice { get; set;  } = string.Empty;
@@ -54,18 +54,35 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string ConnectedDeviceFull { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    public partial bool IsLiveDecimalSymbolChange { get; set; } = false;
+
+    public DecimalSymbolConverter[] DecimalSymbolConverters { get; set; } =
+    [
+        new() { Description = "Dots to commas", ConversionMethod = ConversionExtensions.DotsToCommas, SourceCharacter = '.' },
+        new() { Description = "Commas to dots", ConversionMethod = ConversionExtensions.CommasToDots, SourceCharacter = ',' },
+    ];
+
+    [ObservableProperty]
+    public partial int SelectedDecimalSymbolIndex { get; set; }
+
     public TopLevel? MainVindowTopLevel { get; set;  }
 
     public static string SystemDecimalSeparator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
     public MainWindowViewModel()
     {
+        Settings = AppSettings.Load()?.Result ?? new();
+
         Processor = new(Communicator);
         Processor.Progressed += ProcessorProgressed;
         Processor.LineReceived += ProcessorLineReceived;
         Processor.RecentCommand += ProcessorRecentCommand;
 
         ScpiPayload.PayloadChanged += CurrentPayloadChanged;
+
+        SelectedDecimalSymbolIndex = Settings.RecentDecimalSymbolConverterIndex;
+        IsLiveDecimalSymbolChange = Settings.RecentDecimalSymbolConverterLive;
     }
 
     private void CurrentPayloadChanged(object? sender, EventArgs e) => ProgressSteps = 0;
@@ -74,7 +91,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void ProcessorProgressed(object? sender, EventArgs e) => ProgressSteps++;
 
-    private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => ResultsLines += e.Text.Trim() + Environment.NewLine;
+    private void ProcessorLineReceived(object? sender, PayloadProcessor.LineReceivedEventArgs e) => 
+        ResultsLines += 
+        (IsLiveDecimalSymbolChange 
+         ? DecimalSymbolConverters[SelectedDecimalSymbolIndex].ConversionMethod(e.Text.Trim()) 
+         : e.Text.Trim()) 
+        + Environment.NewLine;
 
     public static async Task SavePayloadToJson(ScpiPayload payload, string fullFileName) => await payload.ToSerialisable().Save(fullFileName);
 
@@ -176,10 +198,16 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public void DotsToCommas() => ResultsLines = ResultsLines.Replace('.', ',');
-
-    [RelayCommand]
-    public void CommasToDots() => ResultsLines = ResultsLines.Replace(',', '.');
+    public void ConvertDecimalSymbol() => ResultsLines = DecimalSymbolConverters[SelectedDecimalSymbolIndex].ConversionMethod(ResultsLines);
 
     partial void OnCurrentPayloadChanged(ScpiPayload value) => ProgressSteps = 0;
+
+    partial void OnSelectedDecimalSymbolIndexChanged(int value) => Settings.RecentDecimalSymbolConverterIndex = value;
+
+    async partial void OnIsLiveDecimalSymbolChangeChanged(bool value)
+    {
+        Settings.RecentDecimalSymbolConverterLive = value;
+        Settings.RecentDecimalSymbolConverterIndex = SelectedDecimalSymbolIndex;
+        await Settings.Save();
+    }
 }

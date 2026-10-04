@@ -184,21 +184,28 @@
 					</TextBox.ContextMenu>
 				</TextBox>
 			</Grid>
-			<Grid Grid.Row="8" Grid.Column="1" RowDefinitions="Auto,3,Auto" ColumnDefinitions="Auto,6,Auto,6,Auto,*" Margin="3" VerticalAlignment="Top" >
-				<Button Grid.Column="0" Content="Dots to commas"
-						Command="{Binding DotsToCommasCommand}"
-						Width="150" HorizontalContentAlignment="Center" />
-				<Button Grid.Column="2" Content="Commas to dots"
-						Command="{Binding CommasToDotsCommand}"
-						Width="150" HorizontalContentAlignment="Center" />
-				<StackPanel Grid.Column="4" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
-					<TextBlock Text="System dec. sep.: " VerticalAlignment="Center" />
-					<TextBlock Text="{Binding SystemDecimalSeparator}" FontWeight="Bold" FontSize="46" Margin="0,-40,0,-60" VerticalAlignment="Center" />
-				</StackPanel>
-				<Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Content="Copy all" 
+			<Grid Grid.Row="8" Grid.Column="1" RowDefinitions="Auto,3,Auto" ColumnDefinitions="3*,6,*" Margin="3" VerticalAlignment="Top" >
+				<Button Grid.Column="0" Content="Copy all" 
 						Command="{Binding CopyTextCommand}" CommandParameter="{Binding ResultsLines}" 
 						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
-				<Button Grid.Row="2" Grid.Column="5" Content="Clear" Command="{Binding ClearResultsCommand}" Width="100" HorizontalAlignment="Right" HorizontalContentAlignment="Center" />
+				<Button Grid.Column="2" Content="Clear" Command="{Binding ClearResultsCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+				<HeaderedContentControl Header="Decimal symbol" Grid.Row="2" Grid.ColumnSpan="3">
+					<Grid ColumnDefinitions="160,3,Auto,3,Auto,*,Auto">
+						<ComboBox Margin="3,0" HorizontalAlignment="Stretch" 
+								  IsEnabled="{Binding IsLiveDecimalSymbolChange, Converter={x:Static BoolConverters.Not}}"
+								  ItemsSource="{Binding DecimalSymbolConverters}"
+								  DisplayMemberBinding="{Binding Description, DataType={x:Type vm:DecimalSymbolConverter}}"
+								  SelectedIndex="{Binding SelectedDecimalSymbolIndex, Mode=TwoWay}" />
+						<Button Content="Convert" Grid.Column="2"
+								IsEnabled="{Binding IsLiveDecimalSymbolChange, Converter={x:Static BoolConverters.Not}}" 
+								Command="{Binding ConvertDecimalSymbol}"/>
+						<ToggleSwitch IsChecked="{Binding IsLiveDecimalSymbolChange, Mode=TwoWay}" OffContent="Live" OnContent="Live" Grid.Column="4" />
+						<StackPanel Grid.Column="6" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+							<TextBlock Text="Detected: " VerticalAlignment="Center" />
+							<TextBlock Text="{Binding SystemDecimalSeparator}" FontWeight="Bold" FontSize="46" Margin="0,-40,0,-60" VerticalAlignment="Center" />
+						</StackPanel>						
+					</Grid>
+				</HeaderedContentControl>
 			</Grid> 
 		</Grid>
 		<Border Grid.Row="3" 

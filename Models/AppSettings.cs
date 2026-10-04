@@ -17,6 +17,10 @@ public class AppSettings
 
     public string RecentUsedFolder { get; set; } = string.Empty;
 
+    public int RecentDecimalSymbolConverterIndex { get; set; } = 0;
+
+    public bool RecentDecimalSymbolConverterLive { get; set; } = true;
+
     public AppSettings() { }
 
     public async Task Save()
